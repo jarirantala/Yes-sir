@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Android
+.gradle/
+local.properties
+.idea/
+.cxx/
+*.iml
+captures/
+.externalNativeBuild
+google-services.json
+
+# Android App
+android/app/build/
+android/build/
+
+# General
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Installed Dependencies (likely for Lambda)
+# Ignoring these as they should be installed via requirements.txt
+bin/
+dateutil/
+icalendar/
+parsedatetime/
+pytz/
+tzdata/
+*.dist-info/
+six.py
