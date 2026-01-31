@@ -27,9 +27,10 @@ One button to rule them all. The system intelligently distinguishes between meet
 ## Project Structure
 * `android/`: Android mobile application (Kotlin/Jetpack Compose).
 * `spec/`: Documentation and specifications.
-* `utils/`: Python helper modules (`parser.py`, `emailer.py`).
-* `handler.py`: Scaleway Function entry point.
-* `requirements.txt`: Python dependencies.
+*   `backend/`: Serverless function code.
+    *   `handler.py`: Scaleway Function entry point.
+    *   `utils/`: Python helper modules.
+    *   `requirements.txt`: Python dependencies.
 
 ## Getting Started
 See [tasks.md](spec/tasks.md) for the current development status and remaining work.

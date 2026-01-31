@@ -6,8 +6,8 @@
     - [ ] Enable Transactional Email (TEM).
     - [ ] Verify domain and sender logic.
 - [ ] **Task B-2:** Create Function Package
-    - [ ] Create `requirements.txt` with `parsedatetime`, `icalendar`, `pytz`, `scaleway-functions-python`.
-    - [ ] Structure project for Scaleway Functions (handler in root).
+    - [ ] Create `backend/requirements.txt` with `parsedatetime`, `icalendar`, `pytz`, `scaleway-functions-python`.
+    - [ ] Structure project for Scaleway Functions (handler is in `backend/`).
 - [ ] **Task B-3:** Implement Function Logic
     - [ ] Write `handler.py` to handle events.
     - [ ] Implement `extract_meeting_details(text)`.
