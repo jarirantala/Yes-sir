@@ -1,21 +1,27 @@
 # Implementation Plan
 
 ## Phase 1: Scaleway Backend Setup
-- [ ] **Task B-1:** Set up Scaleway TEM (Transactional Email)
-    - [ ] Create a Project in Scaleway Console.
-    - [ ] Enable Transactional Email (TEM).
-    - [ ] Verify domain and sender logic.
-- [ ] **Task B-2:** Create Function Package
-    - [ ] Create `backend/requirements.txt` with `parsedatetime`, `icalendar`, `pytz`, `scaleway-functions-python`.
-    - [ ] Structure project for Scaleway Functions (handler is in `backend/`).
-- [ ] **Task B-3:** Implement Function Logic
-    - [ ] Write `handler.py` to handle events.
-    - [ ] Implement `extract_meeting_details(text)`.
-    - [ ] Implement `generate_ics(details)`.
-    - [ ] Implement `send_email(ics_data)` using SMTP or TEM API.
-- [ ] **Task B-4:** Deploy Function
-    - [ ] Deploy function using Scaleway Console or CLI.
-    - [ ] Configure Environment Variables (TEM Key, etc.).
+- [x] **Task B-1:** Set up Scaleway TEM (Transactional Email)
+    - [x] Create a Project in Scaleway Console (User Verified).
+    - [x] Enable Transactional Email (TEM).
+    - [x] Verify domain and sender logic.
+- [x] **Task B-2:** Create Function Package
+    - [x] Create `backend/requirements.txt` with `parsedatetime`, `icalendar`, `pytz`, `pymongo`, `dnspython`.
+    - [x] Structure project for Scaleway Functions (handler is in `backend/`).
+- [x] **Task B-3:** Implement Function Logic
+    - [x] Write `handler.py` to handle events.
+    - [x] Implement `extract_meeting_details(text)`.
+    - [x] Implement `generate_ics(details)`.
+    - [x] Implement `send_email(ics_data)` using SMTP or TEM API.
+- [x] **Task B-4:** Infrastructure as Code (OpenTofu)
+    - [x] Create `infra/` directory.
+    - [x] Create `main.tf` to define Function Namespace and Function resources.
+    - [x] Create `variables.tf` for secrets (SCW credentials, Mongo URI).
+    - [x] Create `outputs.tf` to expose the Function Endpoint.
+- [ ] **Task B-7:** Deploy with OpenTofu
+    - [ ] Initialize OpenTofu (`tofu init`).
+    - [ ] Plan deployment (`tofu plan`).
+    - [ ] Apply deployment (`tofu apply`).
     - [ ] **Validation:** Test with `curl` to ensure email is received.
 
 ## Phase 2: Android App Development
@@ -46,12 +52,12 @@
     - [ ] Verify the calendar invite opens correctly in Google Calendar/Outlook.
 
 ## Phase 4: Voice Todo Feature
-- [ ] **Task B-5:** Integrate MongoDB
-    - [ ] Provision Managed MongoDB Database in Scaleway.
-    - [ ] Add `pymongo` to `requirements.txt`.
-- [ ] **Task B-6:** Implement Todo Logic
-    - [ ] Update `handler.py` to handle `todo` intent.
-    - [ ] Implement `save_to_mongodb(item)` using `pymongo`.
+- [x] **Task B-5:** Integrate MongoDB
+    - [x] Provision Managed MongoDB Database in Scaleway (User Provided).
+    - [x] Add `pymongo` to `requirements.txt`.
+- [x] **Task B-6:** Implement Todo Logic
+    - [x] Update `handler.py` to handle `todo` intent.
+    - [x] Implement `save_to_mongodb(item)` using `pymongo`.
 - [ ] **Task F-5:** Mobile Todo Mode
     - [ ] Add UI Selector for "Calendar" vs "Todo" mode.
     - [ ] Update ViewModel to send to `/todo` endpoint when in Todo mode.

@@ -1,4 +1,4 @@
-import boto3
+import smtplib
 import os
 from icalendar import Calendar, Event
 from email.mime.multipart import MIMEMultipart
@@ -21,11 +21,18 @@ def create_ics(meeting_details):
     cal.add_component(event)
     return cal.to_ical()
 
-def send_email(recipient_email, meeting_details, aws_region='us-east-1', sender_email=None):
+def send_email(recipient_email, meeting_details, sender_email=None):
     """
-    Sends an email with ICS attachment using AWS SES.
+    Sends an email with ICS attachment using Scaleway TEM (SMTP).
     """
+    # Scaleway TEM Creds
+    smtp_server = "smtp.tem.scaleway.com"
+    smtp_port = 587
+    smtp_username = os.environ.get('SCW_ACCESS_KEY')
+    smtp_password = os.environ.get('SCW_SECRET_KEY')
+    
     if not sender_email:
+        # Default sender must be verified in Scaleway TEM
         sender_email = os.environ.get('SENDER_EMAIL', 'noreply@example.com')
 
     ics_data = create_ics(meeting_details)
@@ -44,15 +51,11 @@ def send_email(recipient_email, meeting_details, aws_region='us-east-1', sender_
     part['Content-Disposition'] = 'attachment; filename="invite.ics"'
     msg.attach(part)
     
-    # Send via SES
-    client = boto3.client('ses', region_name=aws_region)
-    
     try:
-        response = client.send_raw_email(
-            Source=sender_email,
-            Destinations=[recipient_email],
-            RawMessage={'Data': msg.as_string()}
-        )
-        return True, response['MessageId']
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.send_message(msg)
+        return True, "Email sent successfully via Scaleway TEM"
     except Exception as e:
         return False, str(e)

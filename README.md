@@ -34,3 +34,5 @@ One button to rule them all. The system intelligently distinguishes between meet
 
 ## Getting Started
 See [tasks.md](spec/tasks.md) for the current development status and remaining work.
+## Deployment
+See [DEPLOYMENT.md](DEPLOYMENT.md) for instructions on deploying to Scaleway Functions.
