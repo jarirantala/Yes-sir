@@ -27,18 +27,27 @@ local.properties
 captures/
 .externalNativeBuild
 google-services.json
+key.properties
+*.keystore
+*.jks
+*.p12
 
 # Android App
-android/app/build/
-android/build/
+**/build/
+
+# Compiled class files
+*.class
+*.dex
+*.apk
+*.ap_
+*.aab
 
 # General
 .DS_Store
 Thumbs.db
 .vscode/
 
-# Installed Dependencies (likely for Lambda)
-# Ignoring these as they should be installed via requirements.txt
+# Installed Dependencies (Lambda Layer artifacts)
 bin/
 dateutil/
 icalendar/

@@ -1,17 +1,17 @@
-#Fri Jan 02 05:39:00 UTC 2026
-base.0=/home/rantalaja/projects/voice-cal/android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
-base.1=/home/rantalaja/projects/voice-cal/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
-base.2=/home/rantalaja/projects/voice-cal/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/10/classes.dex
-base.3=/home/rantalaja/projects/voice-cal/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/4/classes.dex
-base.4=/home/rantalaja/projects/voice-cal/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/7/classes.dex
-base.5=/home/rantalaja/projects/voice-cal/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/8/classes.dex
-base.6=/home/rantalaja/projects/voice-cal/android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
+#Sat Jan 31 12:28:42 EET 2026
+base.0=/home/jari/Documents/projects/Yes-sir/android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
+base.1=/home/jari/Documents/projects/Yes-sir/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+base.2=/home/jari/Documents/projects/Yes-sir/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/2/classes.dex
+base.3=/home/jari/Documents/projects/Yes-sir/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/5/classes.dex
+base.4=/home/jari/Documents/projects/Yes-sir/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/9/classes.dex
+base.5=/home/jari/Documents/projects/Yes-sir/android/app/build/intermediates/global_synthetics_dex/debug/mergeDebugGlobalSynthetics/classes.dex
+base.6=/home/jari/Documents/projects/Yes-sir/android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
 path.0=classes.dex
 path.1=0/classes.dex
-path.2=10/classes.dex
-path.3=4/classes.dex
-path.4=7/classes.dex
-path.5=8/classes.dex
+path.2=2/classes.dex
+path.3=5/classes.dex
+path.4=9/classes.dex
+path.5=classes.dex
 path.6=classes2.dex
 renamed.0=classes.dex
 renamed.1=classes2.dex
