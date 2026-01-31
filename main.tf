@@ -39,7 +39,7 @@ resource "scaleway_function" "main" {
   name               = "voice-assistant"
   runtime            = "python311"
   handler            = "handler.handler"
-  privacy            = "public"
+  privacy            = "private"
   zip_file           = data.archive_file.function_zip.output_path
   zip_hash           = data.archive_file.function_zip.output_base64sha256
   deploy             = true
@@ -63,4 +63,10 @@ resource "scaleway_function" "main" {
     SCW_SECRET_KEY = var.scw_secret_key
     MONGO_PASSWORD = var.mongo_password
   }
+}
+
+# Create a token for the function
+resource "scaleway_function_token" "main" {
+  function_id = scaleway_function.main.id
+  description = "Token for Android App"
 }

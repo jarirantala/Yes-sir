@@ -73,12 +73,22 @@ tofu apply
 
 ### 3. Post-Deployment
 
-Tofu will output the `function_endpoint`.
+Tofu will output the `function_endpoint` and a sensitive `function_token`.
+
+To see the token:
+```bash
+tofu output -raw function_token
+```
 
 **Verification:**
-Use the helper script to invoke the function:
+The helper script automatically fetches the token:
 ```bash
 ./scripts/test_invoke.sh
 ```
+
+**App Integration:**
+You must send the `X-Auth-Token` header with the value of `function_token` in your Android app requests.
+
+Finally, update your Android App's `ApiService` with the URL.
 
 Finally, update your Android App's `ApiService` with the URL.

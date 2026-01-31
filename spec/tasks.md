@@ -16,7 +16,13 @@
 - [x] **Task B-4:** Infrastructure as Code (OpenTofu)
     - [x] Create `main.tf` in root to define Function Namespace and Function resources.
     - [x] Create `variables.tf` in root for secrets.
+    - [x] Create `variables.tf` in root for secrets.
     - [x] Create `outputs.tf` in root to expose endpoint.
+- [ ] **Task B-8:** Implement API Gateway (OpenTofu) - **Skipped (Provider Limitation)**
+    - [ ] Update `main.tf` to set Function privacy to "private".
+    - [ ] Add `scaleway_function_token`.
+    - [ ] Add `scaleway_api_gateway_gateway` and `scaleway_api_gateway_api`.
+    - [ ] Route API Gateway to Function.
 - [ ] **Task B-7:** Deploy with OpenTofu
     - [ ] Initialize OpenTofu (`tofu init`).
     - [ ] Plan deployment (`tofu plan`).
