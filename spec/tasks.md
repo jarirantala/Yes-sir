@@ -1,22 +1,21 @@
 # Implementation Plan
 
-## Phase 1: AWS Backend Setup
-- [ ] **Task B-1:** Set up AWS SES
-    - [ ] Verify sender email address in AWS SES Console.
-    - [ ] Verify recipient email address (if in Sandbox mode).
-- [ ] **Task B-2:** Create Lambda Layer
-    - [ ] Create `requirements.txt` with `parsedatetime`, `icalendar`, `pytz`.
-    - [ ] Install dependencies to a folder and zip it.
-    - [ ] Upload as AWS Lambda Layer.
-- [ ] **Task B-3:** Implement Lambda Logic
-    - [ ] Write `lambda_function.py` to parse JSON input.
-    - [ ] Implement `extract_meeting_details(text)` using `parsedatetime`.
-    - [ ] Implement `generate_ics(details)` using `icalendar`.
-    - [ ] Implement `send_email(ics_data)` using `boto3`.
-- [ ] **Task B-4:** Configure API Gateway
-    - [ ] Create HTTP API.
-    - [ ] Create `POST /invite` route linked to Lambda.
-    - [ ] Enable CORS.
+## Phase 1: Scaleway Backend Setup
+- [ ] **Task B-1:** Set up Scaleway TEM (Transactional Email)
+    - [ ] Create a Project in Scaleway Console.
+    - [ ] Enable Transactional Email (TEM).
+    - [ ] Verify domain and sender logic.
+- [ ] **Task B-2:** Create Function Package
+    - [ ] Create `requirements.txt` with `parsedatetime`, `icalendar`, `pytz`, `scaleway-functions-python`.
+    - [ ] Structure project for Scaleway Functions (handler in root).
+- [ ] **Task B-3:** Implement Function Logic
+    - [ ] Write `handler.py` to handle events.
+    - [ ] Implement `extract_meeting_details(text)`.
+    - [ ] Implement `generate_ics(details)`.
+    - [ ] Implement `send_email(ics_data)` using SMTP or TEM API.
+- [ ] **Task B-4:** Deploy Function
+    - [ ] Deploy function using Scaleway Console or CLI.
+    - [ ] Configure Environment Variables (TEM Key, etc.).
     - [ ] **Validation:** Test with `curl` to ensure email is received.
 
 ## Phase 2: Android App Development
@@ -47,13 +46,12 @@
     - [ ] Verify the calendar invite opens correctly in Google Calendar/Outlook.
 
 ## Phase 4: Voice Todo Feature
-- [ ] **Task B-5:** Integrate Valkey
-    - [ ] Set up Valkey instance.
-    - [ ] Add `redis` library to Lambda Layer.
+- [ ] **Task B-5:** Integrate MongoDB
+    - [ ] Provision Managed MongoDB Database in Scaleway.
+    - [ ] Add `pymongo` to `requirements.txt`.
 - [ ] **Task B-6:** Implement Todo Logic
-    - [ ] Create `POST /todo` endpoint in API Gateway.
-    - [ ] Update Lambda to handle `todo` skill.
-    - [ ] Implement `save_to_valkey(item)`.
+    - [ ] Update `handler.py` to handle `todo` intent.
+    - [ ] Implement `save_to_mongodb(item)` using `pymongo`.
 - [ ] **Task F-5:** Mobile Todo Mode
     - [ ] Add UI Selector for "Calendar" vs "Todo" mode.
     - [ ] Update ViewModel to send to `/todo` endpoint when in Todo mode.

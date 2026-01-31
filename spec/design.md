@@ -7,10 +7,10 @@ The system follows a **Client-Serverless** architecture designed for extensibili
 sequenceDiagram
     participant User
     participant App as Assistant App
-    participant APIG as AWS API Gateway
-    participant Lambda as Assistant Lambda
-    participant SES as Amazon SES
-    participant Valkey as Valkey DB
+    participant App as Assistant App
+    participant Func as Scaleway Function
+    participant TEM as Scaleway TEM
+    participant Mongo as MongoDB
     participant Email as User Email
 
     Note over User, App: Feature: Voice Calendar
@@ -19,14 +19,14 @@ sequenceDiagram
     App->>App: SpeechRecognizer (Audio -> Text)
     App->>User: Transcribed Text
     User->>App: Clicks Send Button
-    App->>APIG: POST /invite {transcript, timezone, skill="calendar"}
-    Note right of APIG: See api.md for details
-    APIG->>Lambda: Trigger Function (Router)
-    Lambda->>Lambda: Route to Calendar Logic
-    Lambda->>Lambda: Parse Date & Generate .ics
-    Lambda->>SES: SendRawEmail (w/ attachment)
-    SES->>Email: Deliver Email
-    Lambda-->>App: 200 OK
+    App->>Func: POST /command {transcript, timezone}
+    Note right of Func: See api.md for details
+    Func->>Func: Route to Calendar Logic
+    Func->>Func: Parse Date & Generate .ics
+    Func->>TEM: Send Email (w/ attachment)
+    TEM->>Email: Deliver Email
+    Func-->>App: 200 OK
+
     App-->>User: Toast "Success"
 
     Note over User, App: Feature: Voice Todo
@@ -35,11 +35,13 @@ sequenceDiagram
     App->>App: SpeechRecognizer
     App->>User: Transcribed Text
     User->>App: Clicks Send Button
-    App->>APIG: POST /todo {transcript, priority="normal"}
-    APIG->>Lambda: Trigger Function
-    Lambda->>Lambda: Route to Todo Logic
-    Lambda->>Valkey: RPUSH todo:list "Buy milk"
-    Lambda-->>App: 200 OK (id: 123)
+    App->>App: SpeechRecognizer
+    App->>User: Transcribed Text
+    User->>App: Clicks Send Button
+    App->>Func: POST /command {transcript}
+    Func->>Func: Route to Todo Logic
+    Func->>Mongo: Insert Todo Item
+    Func-->>App: 200 OK (id: 123)
     App-->>User: Toast "Saved"
 ```
 
@@ -50,10 +52,10 @@ sequenceDiagram
 *   **Voice Input:** Centralized voice capture component usable by different skills.
 *   **Networking:** Shared API client for backend communication.
 
-### 2.2 Backend (AWS Serverless)
-*   **API Gateway:** Single entry point for assistant requests.
-*   **Lambda:** Hosts logic for Voice Calendar and Voice Todo. Routes requests based on endpoint/parameters.
-*   **Persistence (Valkey):** High-performance key-value store for Todo items and other state.
+### 2.2 Backend (Scaleway Serverless)
+*   **Function Endpoint:** Single entry point for assistant requests.
+*   **Scaleway Functions:** Python function hosting logic for Voice Calendar and Voice Todo.
+*   **Persistence (MongoDB):** Managed Document Store for Todo items and other state.
 
 ## 3. Data Flow
 
@@ -67,4 +69,4 @@ sequenceDiagram
 1.  **Capture:** User speaks task.
 2.  **Transcribe:** Device converts speech to text.
 3.  **Process:** Backend interprets text (extracts priority, tags).
-4.  **Action:** Backend saves the item to Valkey.
+4.  **Action:** Backend saves the item to MongoDB.

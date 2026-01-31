@@ -46,11 +46,11 @@ The application extends beyond a single utility, providing a platform for variou
 * **REQ-B-003:** **WHEN** no date is specified in the text, **THE SYSTEM SHALL** default to "Tomorrow at 9:00 AM".
 * **REQ-B-004:** **WHEN** no duration is specified, **THE SYSTEM SHALL** default to 60 minutes.
 * **REQ-B-005:** **WHEN** parsing is complete, **THE SYSTEM SHALL** generate a valid iCalendar (`.ics`) file.
-* **REQ-B-006:** **WHEN** the `.ics` file is ready, **THE SYSTEM SHALL** email it to the configured recipient using AWS SES.
+* **REQ-B-006:** **WHEN** the `.ics` file is ready, **THE SYSTEM SHALL** email it to the configured recipient using Scaleway Transactional Email (TEM).
 
 ### 3.4 Feature: Voice Todo (Backend)
 * **REQ-B-010:** **WHEN** the intent is **TODO**, **THE SYSTEM SHALL** extract the task description and priority.
-* **REQ-B-011:** **WHEN** the task is parsed, **THE SYSTEM SHALL** save the item to the persistent key-value store.
+* **REQ-B-011:** **WHEN** the task is parsed, **THE SYSTEM SHALL** save the item to the MongoDB database.
 * **REQ-B-012:** **WHEN** the item is saved, **THE SYSTEM SHALL** respond with the saved item ID.
 
 ## 4. Non-Functional Requirements

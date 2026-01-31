@@ -6,12 +6,12 @@ A modular, voice-first mobile application designed to assist with daily tasks an
 ### 1. Voice Calendar
 Listens to your voice, extracts meeting details, and emails you a calendar invite.
 *   *Status:* Partially Implemented
-*   *Key Tech:* Android (SpeechRecognizer), AWS Lambda, parsedatetime.
+*   *Key Tech:* Android (SpeechRecognizer), Scaleway Functions, parsedatetime.
 
 ### 2. Voice Todo
 Capture tasks and ideas quickly just by speaking. The system automatically identifies priorities and saves them to your list.
 *   *Status:* Specification Phase
-*   *Key Tech:* Valkey (Redis), Key-Value Store.
+*   *Key Tech:* MongoDB.
 
 ### 3. Unified Voice Commands
 One button to rule them all. The system intelligently distinguishes between meeting invites and todo items based on natural language processing.
@@ -28,8 +28,8 @@ One button to rule them all. The system intelligently distinguishes between meet
 * `android/`: Android mobile application (Kotlin/Jetpack Compose).
 * `spec/`: Documentation and specifications.
 * `utils/`: Python helper modules (`parser.py`, `emailer.py`).
-* `lambda-function.py`: AWS Lambda entry point.
-* `requirements.txt`: Python dependencies for Lambda layer.
+* `handler.py`: Scaleway Function entry point.
+* `requirements.txt`: Python dependencies.
 
 ## Getting Started
 See [tasks.md](spec/tasks.md) for the current development status and remaining work.
