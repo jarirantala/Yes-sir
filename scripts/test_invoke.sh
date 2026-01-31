@@ -10,15 +10,17 @@ fi
 
 echo "Invoking function at: https://$ENDPOINT"
 
-# Test Payload (Meeting Intent)
-PAYLOAD='{
-  "transcript": "Schedule a meeting with Team for tomorrow at 10 AM",
-  "timezone": "Europe/Paris",
-  "email": "test@example.com"
-}'
-
-curl -X POST "https://$ENDPOINT" \
-     -H "Content-Type: application/json" \
-     -d "$PAYLOAD"
+# Test Payload (from file)
+PAYLOAD_FILE="scripts/payload.json"
+if [ -f "$PAYLOAD_FILE" ]; then
+  echo "Using payload from $PAYLOAD_FILE"
+  # Use @ syntax for curl to read from file
+  curl -X POST "https://$ENDPOINT" \
+       -H "Content-Type: application/json" \
+       -d "@$PAYLOAD_FILE"
+else
+  echo "Error: $PAYLOAD_FILE not found."
+  exit 1
+fi
 
 echo -e "\n\nDone."

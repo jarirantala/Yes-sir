@@ -4,8 +4,8 @@ import logging
 import datetime
 import uuid
 import pymongo
-from utils.parser import extract_meeting_details
-from utils.emailer import send_email
+# from utils.parser import extract_meeting_details
+# from utils.emailer import send_email
 
 # Configure logging
 logger = logging.getLogger()

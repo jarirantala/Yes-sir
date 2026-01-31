@@ -35,14 +35,15 @@ resource "scaleway_function_namespace" "main" {
 
 # Deploy Function
 resource "scaleway_function" "main" {
-  namespace_id = scaleway_function_namespace.main.id
-  name         = "voice-assistant"
-  runtime      = "python311"
-  handler      = "handler.handler"
-  privacy      = "public"
-  zip_file     = data.archive_file.function_zip.output_path
-  zip_hash     = data.archive_file.function_zip.output_base64sha256
-  deploy       = true
+  namespace_id       = scaleway_function_namespace.main.id
+  name               = "voice-assistant"
+  runtime            = "python311"
+  handler            = "handler.handler"
+  privacy            = "public"
+  zip_file           = data.archive_file.function_zip.output_path
+  zip_hash           = data.archive_file.function_zip.output_base64sha256
+  deploy             = true
+  private_network_id = var.mongo_private_network_id
 
   # Deploy the function after the zip is ready
   depends_on = [data.archive_file.function_zip]
