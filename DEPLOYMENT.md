@@ -29,9 +29,9 @@ This guide details how to deploy the Voice Assistant backend to Scaleway Functio
 We use **OpenTofu** (or Terraform) to manage the infrastructure.
 
 ### 1. Prepare Credentials
-The `infra/` configuration requires several variables. You can populate them using a `terraform.tfvars` file or environment variables.
+The OpenTofu configuration is in the root directory. You can populate variables using a `terraform.tfvars` file or environment variables.
 
-**Recommended:** Create `infra/terraform.tfvars` with the following content (DO NOT COMMIT THIS FILE):
+**Recommended:** Create `terraform.tfvars` in the root directory with the following content (DO NOT COMMIT THIS FILE):
 
 ```hcl
 scw_access_key           = "SCW..."
@@ -49,10 +49,11 @@ sender_email             = "..."
 
 ### 2. Run OpenTofu
 
-Navigate to the `infra/` directory:
+Ensure you are in the project root:
 
 ```bash
-cd infra
+# Verify you see main.tf
+ls main.tf
 ```
 
 Initialize the project:

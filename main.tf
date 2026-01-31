@@ -21,7 +21,7 @@ provider "scaleway" {
 # Zip the backend code
 data "archive_file" "function_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/../backend"
+  source_dir  = "${path.module}/backend"
   output_path = "${path.module}/function.zip"
   excludes    = [".env", "__pycache__", "*.pyc", "venv", ".venv"]
 }

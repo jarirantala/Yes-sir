@@ -14,10 +14,9 @@
     - [x] Implement `generate_ics(details)`.
     - [x] Implement `send_email(ics_data)` using SMTP or TEM API.
 - [x] **Task B-4:** Infrastructure as Code (OpenTofu)
-    - [x] Create `infra/` directory.
-    - [x] Create `main.tf` to define Function Namespace and Function resources.
-    - [x] Create `variables.tf` for secrets (SCW credentials, Mongo URI).
-    - [x] Create `outputs.tf` to expose the Function Endpoint.
+    - [x] Create `main.tf` in root to define Function Namespace and Function resources.
+    - [x] Create `variables.tf` in root for secrets.
+    - [x] Create `outputs.tf` in root to expose endpoint.
 - [ ] **Task B-7:** Deploy with OpenTofu
     - [ ] Initialize OpenTofu (`tofu init`).
     - [ ] Plan deployment (`tofu plan`).
