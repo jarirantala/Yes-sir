@@ -72,5 +72,13 @@ tofu apply
 ```
 
 ### 3. Post-Deployment
+
 Tofu will output the `function_endpoint`.
-Update your Android App's `ApiService` with this URL.
+
+**Verification:**
+Use the helper script to invoke the function:
+```bash
+./scripts/test_invoke.sh
+```
+
+Finally, update your Android App's `ApiService` with the URL.

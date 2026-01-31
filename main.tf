@@ -42,6 +42,7 @@ resource "scaleway_function" "main" {
   privacy      = "public"
   zip_file     = data.archive_file.function_zip.output_path
   zip_hash     = data.archive_file.function_zip.output_base64sha256
+  deploy       = true
 
   # Deploy the function after the zip is ready
   depends_on = [data.archive_file.function_zip]

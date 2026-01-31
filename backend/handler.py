@@ -68,13 +68,17 @@ def determine_intent(transcript):
     return "TODO" # Default fallback
 
 def handle_meeting(transcript, timezone, recipient_email):
-    details = extract_meeting_details(transcript, timezone)
-    success, result = send_email(recipient_email, details)
+    # details = extract_meeting_details(transcript, timezone)
+    # success, result = send_email(recipient_email, details)
+    
+    # Mock for now while dependencies are sorted out
+    success = True
+    result = "mock-message-id"
     
     if success:
          return {
             'statusCode': 200,
-            'body': json.dumps({'type': 'meeting', 'message': 'Invite sent', 'data': {'messageId': result}})
+            'body': json.dumps({'type': 'meeting', 'message': 'Invite sent (MOCKED)', 'data': {'messageId': result}})
         }
     else:
         return {
@@ -118,14 +122,31 @@ def handler(event, context):
     """
     Scaleway Function Entry Point.
     """
+    # Debug: Log event keys to understand structure
+    if event:
+        logger.info(f"Event keys: {list(event.keys())}")
+        if 'body' in event:
+            logger.info(f"Body type: {type(event['body'])}")
+    else:
+        logger.info("Event is None or empty")
+
     try:
         # Parse Body
         body = event.get('body', {})
+        
+        # If body is a string (common in HTTP triggers), try to parse it
         if isinstance(body, str):
             try:
-                body = json.loads(body)
-            except:
-                pass
+                if not body.strip():
+                     body = {}
+                else:
+                    body = json.loads(body)
+            except json.JSONDecodeError as e:
+                logger.error(f"JSON Parse Error: {e} - Body: {body[:100]}")
+                return {
+                    'statusCode': 400,
+                    'body': json.dumps({'error': 'Invalid JSON body'})
+                }
         
         # Handle case where body might be None
         if not body:
@@ -141,7 +162,7 @@ def handler(event, context):
                 'body': json.dumps({'error': 'Missing transcript'})
             }
 
-        logger.info(f"Received: {transcript}")
+        logger.info(f"Received Transcript: {transcript}")
         
         intent = determine_intent(transcript)
         logger.info(f"Intent classified as: {intent}")
@@ -157,7 +178,7 @@ def handler(event, context):
             return handle_todo(transcript)
 
     except Exception as e:
-        logger.error(f"Handler Error: {e}")
+        logger.error(f"Handler Unexpected Error: {e}", exc_info=True)
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
