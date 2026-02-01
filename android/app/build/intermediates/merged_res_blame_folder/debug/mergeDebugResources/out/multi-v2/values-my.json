@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.yessir.app-mergeDebugResources-38:/values-my/values-my.xml",
+            "outputFile": "com.example.yessir.app-mergeDebugResources-41:/values-my/values-my.xml",
             "map": [
                 {
                     "source": "/home/jari/.gradle/caches/9.1.0/transforms/5aa6a5e9af3f945749396a8bdf91b436/transformed/core-1.12.0/res/values-my/values-my.xml",

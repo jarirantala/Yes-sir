@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.yessir.app-mergeDebugResources-38:/values-sq/values-sq.xml",
+            "outputFile": "com.example.yessir.app-mergeDebugResources-41:/values-sq/values-sq.xml",
             "map": [
                 {
                     "source": "/home/jari/.gradle/caches/9.1.0/transforms/fb6fcd30be5a2c9b64c97b4546af9287/transformed/jetified-material3-1.1.1/res/values-sq/values-sq.xml",

@@ -30,23 +30,23 @@
     - [ ] **Validation:** Test with `curl` to ensure email is received.
 
 ## Phase 2: Android App Development
-- [ ] **Task F-1:** Project Initialization
-    - [ ] Create new Android Studio project (Compose Activity).
-    - [ ] Add Retrofit and Gson dependencies to `build.gradle`.
-    - [ ] Add `INTERNET` and `RECORD_AUDIO` permissions to Manifest.
-- [ ] **Task F-2:** Networking Layer
-    - [ ] Define `MeetingRequest` and `MeetingResponse` data classes.
-    - [ ] Create `ApiService` interface with POST method.
-    - [ ] Initialize `Retrofit` client singleton.
-- [ ] **Task F-3:** Voice Logic
-    - [ ] Implement `SpeechRecognizer` contract.
-    - [ ] Create a composable `RecordButton` that detects touch down/up events.
-    - [ ] Handle runtime permission request for Microphone.
-- [ ] **Task F-4:** UI & Integration
-    - [ ] Build Main Screen with State Hoisting.
-    - [ ] Connect `SpeechRecognizer` output to `ViewModel`.
-    - [ ] Trigger API call upon successful transcription.
-    - [ ] Show Toast/Snackbar on API success/failure.
+- [x] **Task F-1:** Project Initialization
+    - [x] Create new Android Studio project (Compose Activity).
+    - [x] Add Retrofit and Gson dependencies to `build.gradle`.
+    - [x] Add `INTERNET` and `RECORD_AUDIO` permissions to Manifest.
+- [x] **Task F-2:** Networking Layer
+    - [x] Define `MeetingRequest` and `MeetingResponse` data classes.
+    - [x] Create `ApiService` interface with POST method.
+    - [x] Initialize `Retrofit` client singleton.
+- [x] **Task F-3:** Voice Logic
+    - [x] Implement `SpeechRecognizer` contract.
+    - [x] Create a composable `RecordButton` that detects touch down/up events.
+    - [x] Handle runtime permission request for Microphone.
+- [x] **Task F-4:** UI & Integration
+    - [x] Build Main Screen with State Hoisting.
+    - [x] Connect `SpeechRecognizer` output to `ViewModel`.
+    - [x] Trigger API call upon successful transcription.
+    - [x] Show Toast/Snackbar on API success/failure.
 
 ## Phase 3: Final Polish
 - [ ] **Task P-1:** Edge Case Handling
