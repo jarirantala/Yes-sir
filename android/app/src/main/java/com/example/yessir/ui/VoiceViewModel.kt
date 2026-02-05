@@ -7,14 +7,25 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.yessir.media.AudioRecorder
 import com.example.yessir.model.VoiceRepository
+import com.example.yessir.model.CommandResponse
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.TimeZone
 
+// Sealed UI State
+sealed class VoiceUiState {
+    object Ready : VoiceUiState()
+    object Listening : VoiceUiState()
+    object Transcribing : VoiceUiState()
+    object Processing : VoiceUiState()
+    data class Success(val message: String, val parsedData: Map<String, Any>?) : VoiceUiState()
+    data class Error(val message: String, val details: String? = null) : VoiceUiState()
+}
+
 class VoiceViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _uiState = MutableLiveData<String>("Ready")
-    val uiState: LiveData<String> = _uiState
+    private val _uiState = MutableLiveData<VoiceUiState>(VoiceUiState.Ready)
+    val uiState: LiveData<VoiceUiState> = _uiState
 
     private val repository = VoiceRepository()
     private val audioRecorder = AudioRecorder(application)
@@ -25,9 +36,9 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
             val cacheDir = getApplication<Application>().cacheDir
             recordingFile = File.createTempFile("voice_command", ".m4a", cacheDir)
             audioRecorder.start(recordingFile!!)
-            _uiState.value = "Listening..."
+            _uiState.value = VoiceUiState.Listening
         } catch (e: Exception) {
-            _uiState.value = "Error starting recording: ${e.message}"
+            _uiState.value = VoiceUiState.Error("Error starting recording", e.message)
         }
     }
 
@@ -36,45 +47,45 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
             audioRecorder.stop()
             processRecording()
         } catch (e: Exception) {
-            _uiState.value = "Error stopping recording: ${e.message}"
+            _uiState.value = VoiceUiState.Error("Error stopping recording", e.message)
         }
     }
 
     private fun processRecording() {
         val file = recordingFile ?: return
-        _uiState.value = "Transcribing..."
+        _uiState.value = VoiceUiState.Transcribing
 
         viewModelScope.launch {
             val result = repository.transcribeAudio(file)
             result.onSuccess { response ->
                 val transcript = response.transcript
-                _uiState.value = "Transcript: $transcript"
-                // Auto-confirm for now, or we could wait for user input
                 processCommand(transcript)
             }.onFailure { e ->
-                _uiState.value = "Transcription Failed: ${e.message}"
+                _uiState.value = VoiceUiState.Error("Transcription Failed", e.message)
             }
         }
     }
 
     fun processCommand(transcript: String) {
-        _uiState.value = "Executing: $transcript"
+        _uiState.value = VoiceUiState.Processing
 
         viewModelScope.launch {
             val timezone = TimeZone.getDefault().id
             val result = repository.sendCommand(transcript, timezone)
             
             result.onSuccess { response ->
-                _uiState.value = "Success: ${response.message}"
+                if (response.error != null) {
+                    _uiState.value = VoiceUiState.Error(response.error, response.details)
+                } else {
+                    _uiState.value = VoiceUiState.Success(response.message, response.parsedData)
+                }
             }.onFailure { e ->
-                _uiState.value = "Command Failed: ${e.message}"
+                 _uiState.value = VoiceUiState.Error("Command Failed", e.message)
             }
         }
     }
     
-    override fun onCleared() {
-        super.onCleared()
-        // Ensure recorder is cleaned up
-        // audioRecorder.release() // if we had a release method
+    fun reset() {
+        _uiState.value = VoiceUiState.Ready
     }
 }
