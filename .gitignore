@@ -56,6 +56,15 @@ pytz/
 tzdata/
 *.dist-info/
 six.py
+bson/
+dns/
+gridfs/
+pymongo/
+requests/
+urllib3/
+certifi/
+idna/
+charset_normalizer/
 
 # OpenTofu / Terraform
 .terraform/
