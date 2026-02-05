@@ -44,4 +44,7 @@ dependencies {
 
     // LiveData for Compose
     implementation 'androidx.compose.runtime:runtime-livedata'
+    
+    // OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }

@@ -26,19 +26,26 @@ The application extends beyond a single utility, providing a platform for variou
 * **REQ-GEN-001:** **WHEN** the app launches, **THE SYSTEM SHALL** present a dashboard of available assistant features (currently starting with Voice Calendar).
 
 ### 3.1 Feature: Mobile Voice Capture (Unified)
-* **REQ-F-001:** **WHEN** the user holds the record button, **THE SYSTEM SHALL** capture audio via the microphone using `SpeechRecognizer`.
-* **REQ-F-002:** **WHEN** the user releases the record button, **THE SYSTEM SHALL** stop recording and transcribe audio to text locally.
+* **REQ-F-001:** **WHEN** the user holds the record button, **THE SYSTEM SHALL** capture audio via the microphone to a local temporary file using `AudioRecorder`.
+* **REQ-F-002:** **WHEN** the user releases the record button, **THE SYSTEM SHALL** stop recording and upload the audio file to the backend for transcription.
 * **REQ-F-003:** **WHEN** transcription is complete, **THE SYSTEM SHALL** display the transcribed text on screen.
 * **REQ-F-004:** **WHEN** a valid transcript is captured, **THE SYSTEM SHALL** automatically POST the transcript and the device's timezone to the backend `POST /command` endpoint.
 * **REQ-F-005:** **WHEN** the API responds with a "meeting" type, **THE SYSTEM SHALL** show a "Invite Sent" confirmation toast.
 * **REQ-F-006:** **WHEN** the API responds with a "todo" type, **THE SYSTEM SHALL** show a "Task Saved" confirmation toast.
-* **REQ-F-007:** **WHEN** the API fails or returns unknown intent, **THE SYSTEM SHALL** display an error message.
+* **REQ-F-007:** **WHEN** the API fails or returns an error, **THE SYSTEM SHALL** display the specific error message and details returned by the backend on the screen.
+* **REQ-F-008:** **WHEN** a successful response is received, **THE SYSTEM SHALL** display the `parsed_data` JSON on the main screen for user verification.
 
-### 3.2 Feature: Intent Recognition (Backend)
-* **REQ-B-020:** **WHEN** the `POST /command` endpoint receives a request, **THE SYSTEM SHALL** analyze the transcript for intent keywords.
-* **REQ-B-021:** **WHEN** the transcript contains specific keywords (e.g., "meeting", "invite", "schedule"), **THE SYSTEM SHALL** classify the intent as **MEETING**.
-* **REQ-B-022:** **WHEN** the transcript contains specific keywords (e.g., "todo", "task", "remind me"), **THE SYSTEM SHALL** classify the intent as **TODO**.
-* **REQ-B-023:** **WHEN** no keywords match, **THE SYSTEM SHALL** default to **TODO** (fallback).
+### 3.2 Feature: Intent Recognition (Backend LLM)
+* **REQ-B-020:** **WHEN** the `POST /command` endpoint receives a request, **THE SYSTEM SHALL** send the transcript to **Llama 3.1 70B Instruct** for analysis.
+* **REQ-B-021:** **THE SYSTEM SHALL** use **System Prompting** to define the assistant's persona and enforce a strict JSON output format.
+* **REQ-B-022:** **THE SYSTEM SHALL** enable **JSON Mode** (if supported by the provider) or strictly enforce JSON structure via the prompt to ensure deterministic parsing.
+* **REQ-B-023:** **THE SYSTEM SHALL** extract the following fields in the JSON output:
+    *   `intent`: One of "MEETING" or "TODO".
+    *   `title`: A concise summary or original text.
+    *   `datetime`: ISO 8601 formatted date/time (for meetings).
+    *   `duration`: Duration in minutes (for meetings).
+    *   `priority`: One of "low", "medium", "high" (for todos).
+* **REQ-B-024:** **WHEN** the LLM fails to return valid JSON, **THE SYSTEM SHALL** treat it as a generic Todo.
 
 ### 3.3 Feature: Voice Calendar (Backend)
 * **REQ-B-001:** **WHEN** the intent is **MEETING**, **THE SYSTEM SHALL** proceed with extraction logic.

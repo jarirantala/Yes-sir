@@ -4,6 +4,7 @@ import logging
 import datetime
 import uuid
 import pymongo
+import requests
 # from utils.parser import extract_meeting_details
 # from utils.emailer import send_email
 
@@ -67,6 +68,45 @@ def determine_intent(transcript):
             
     return "TODO" # Default fallback
 
+def handle_speech_to_text(audio_data, content_type):
+    """
+    Calls Scaleway's Speech-to-Text API to transcribe audio.
+    """
+    api_key = os.environ.get('SCALEWAY_API_KEY')
+    api_url = os.environ.get('SCALEWAY_API_URL', 'https://api.scaleway.com/speech-to-text/v1/transcriptions') # Example URL
+
+    if not api_key:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': 'Scaleway API key not configured'})
+        }
+
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': content_type
+    }
+
+    try:
+        # Note: The Scaleway API might expect multipart/form-data instead of raw bytes.
+        # This implementation assumes raw bytes are accepted.
+        # If not, the code will need to be adjusted to build a multipart request.
+        response = requests.post(api_url, headers=headers, data=audio_data)
+        response.raise_for_status()
+        
+        transcription = response.json()
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'transcript': transcription.get('text')})
+        }
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Scaleway API Error: {e}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': 'Failed to call Speech-to-Text API', 'details': str(e)})
+        }
+
+
 def handle_meeting(transcript, timezone, recipient_email):
     # details = extract_meeting_details(transcript, timezone)
     # success, result = send_email(recipient_email, details)
@@ -122,45 +162,41 @@ def handler(event, context):
     """
     Scaleway Function Entry Point.
     """
-    # Debug: Log event keys to understand structure
-    if event:
-        logger.info(f"Event keys: {list(event.keys())}")
-        if 'body' in event:
-            logger.info(f"Body type: {type(event['body'])}")
-    else:
+    if not event:
         logger.info("Event is None or empty")
+        return {'statusCode': 400, 'body': json.dumps({'error': 'No event data'})}
 
+    logger.info(f"Event keys: {list(event.keys())}")
+    headers = event.get('headers', {})
+    content_type = headers.get('content-type', 'application/json')
+    
     try:
-        # Parse Body
+        # If content-type suggests audio, process as speech-to-text
+        if content_type.startswith('audio/'):
+            audio_data = event.get('body')
+            if not audio_data:
+                return {'statusCode': 400, 'body': json.dumps({'error': 'Missing audio data in body'})}
+            
+            # Body might be base64 encoded by the gateway, decode if so.
+            # This is a common pattern, but might need adjustment.
+            if event.get('isBase64Encoded', False):
+                import base64
+                audio_data = base64.b64decode(audio_data)
+
+            return handle_speech_to_text(audio_data, content_type)
+
+        # Otherwise, assume JSON and process as before
         body = event.get('body', {})
-        
-        # If body is a string (common in HTTP triggers), try to parse it
         if isinstance(body, str):
             try:
-                if not body.strip():
-                     body = {}
-                else:
-                    body = json.loads(body)
+                body = json.loads(body) if body.strip() else {}
             except json.JSONDecodeError as e:
                 logger.error(f"JSON Parse Error: {e} - Body: {body[:100]}")
-                return {
-                    'statusCode': 400,
-                    'body': json.dumps({'error': 'Invalid JSON body'})
-                }
+                return {'statusCode': 400, 'body': json.dumps({'error': 'Invalid JSON body'})}
         
-        # Handle case where body might be None
-        if not body:
-            body = {}
-            
         transcript = body.get('transcript')
-        timezone = body.get('timezone', 'UTC')
-        recipient_email = body.get('email') or os.environ.get('RECIPIENT_EMAIL')
-        
         if not transcript:
-             return {
-                'statusCode': 400,
-                'body': json.dumps({'error': 'Missing transcript'})
-            }
+            return {'statusCode': 400, 'body': json.dumps({'error': 'Missing transcript in JSON body'})}
 
         logger.info(f"Received Transcript: {transcript}")
         
@@ -168,11 +204,10 @@ def handler(event, context):
         logger.info(f"Intent classified as: {intent}")
         
         if intent == "MEETING":
+            recipient_email = body.get('email') or os.environ.get('RECIPIENT_EMAIL')
             if not recipient_email:
-                 return {
-                    'statusCode': 500,
-                    'body': json.dumps({'error': 'Recipient email not configured'})
-                }
+                return {'statusCode': 500, 'body': json.dumps({'error': 'Recipient email not configured'})}
+            timezone = body.get('timezone', 'UTC')
             return handle_meeting(transcript, timezone, recipient_email)
         else:
             return handle_todo(transcript)

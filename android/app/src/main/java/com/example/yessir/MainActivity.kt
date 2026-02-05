@@ -1,12 +1,8 @@
 package com.example.yessir
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -26,66 +22,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.yessir.ui.VoiceViewModel
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private val viewModel: VoiceViewModel by viewModels()
-    private var speechRecognizer: SpeechRecognizer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize SpeechRecognizer
-        if (SpeechRecognizer.isRecognitionAvailable(this)) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this).apply {
-                setRecognitionListener(object : RecognitionListener {
-                    override fun onReadyForSpeech(params: Bundle?) { viewModel.setStatus("Listening...") }
-                    override fun onBeginningOfSpeech() {}
-                    override fun onRmsChanged(rmsdB: Float) {}
-                    override fun onBufferReceived(buffer: ByteArray?) {}
-                    override fun onEndOfSpeech() { viewModel.setStatus("Processing Audio...") }
-                    override fun onError(error: Int) { 
-                        val message = when(error) {
-                            SpeechRecognizer.ERROR_NO_MATCH -> "No match"
-                            SpeechRecognizer.ERROR_NETWORK -> "Network Error"
-                            else -> "Error: $error"
-                        }
-                        viewModel.setStatus(message)
-                    }
-                    override fun onResults(results: Bundle?) {
-                        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                        if (!matches.isNullOrEmpty()) {
-                            val transcript = matches[0]
-                            viewModel.processTranscript(transcript)
-                        }
-                    }
-                    override fun onPartialResults(partialResults: Bundle?) {}
-                    override fun onEvent(eventType: Int, params: Bundle?) {}
-                })
-            }
-        }
-
         setContent {
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    VoiceApp(viewModel, speechRecognizer)
+                    VoiceApp(viewModel)
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        speechRecognizer?.destroy()
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun VoiceApp(viewModel: VoiceViewModel, speechRecognizer: SpeechRecognizer?) {
+fun VoiceApp(viewModel: VoiceViewModel) {
     val status by viewModel.uiState.observeAsState("Ready")
     val context = LocalContext.current
     
@@ -125,23 +84,14 @@ fun VoiceApp(viewModel: VoiceViewModel, speechRecognizer: SpeechRecognizer?) {
                         }
                         return@pointerInteropFilter false
                     }
-                    if (speechRecognizer == null) {
-                         Toast.makeText(context, "Speech Recognizer not available", Toast.LENGTH_SHORT).show()
-                         return@pointerInteropFilter false
-                    }
 
                     when (it.action) {
                         MotionEvent.ACTION_DOWN -> {
-                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                            }
-                            speechRecognizer.startListening(intent)
+                            viewModel.startRecording()
                             true
                         }
                         MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                            speechRecognizer.stopListening()
+                            viewModel.stopRecording()
                             true
                         }
                         else -> false

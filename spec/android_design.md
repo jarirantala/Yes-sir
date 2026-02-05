@@ -8,11 +8,11 @@ We will use **Model-View-ViewModel (MVVM)** to separate UI logic from business l
     *   Handles UI rendering (Button, Toasts).
     *   Observes ViewModel state (`LiveData` or `StateFlow`).
 2.  **ViewModel (`VoiceViewModel`)**:
-    *   Manages `SpeechRecognizer` state (Listening, Error, Result).
-    *   Initiates API calls via the Repository.
+    *   Manages `AudioRecorder` state (Recording, Idle).
+    *   Initiates API calls via the Repository (Upload, then Execute).
 3.  **Model / Repository (`VoiceRepository`)**:
     *   Abstracts the data source.
-    *   Calls `ApiService` (Retrofit).
+    *   Calls `ApiService` (Retrofit) for both `transcribeAudio` and `sendCommand`.
 
 ## 2. Tech Stack
 *   **Language**: Kotlin
@@ -20,16 +20,22 @@ We will use **Model-View-ViewModel (MVVM)** to separate UI logic from business l
 *   **Concurrency**: Kotlin Coroutines
 *   **Dependency Injection**: Hilt (Optional, or manual DI for simplicity initially)
 *   **JSON Parsing**: Gson or Moshi
+*   **Audio**: `MediaRecorder` (AAC/M4A)
 
 ## 3. Data Flow
 1.  User holds "Record".
-2.  `SpeechRecognizer` captures audio -> returns String `transcript`.
-3.  `VoiceViewModel` receives `transcript`.
-4.  `VoiceViewModel` calls `VoiceRepository.sendCommand(transcript)`.
-5.  `VoiceRepository` uses `ApiService` to POST to Scaleway.
-6.  Backend returns JSON (`{ "type": "meeting", ... }`).
-7.  `VoiceViewModel` updates `uiState` with Success/Error.
-8.  `MainActivity` shows Toast based on `uiState`.
+2.  `AudioRecorder` captures audio to file.
+3.  User releases "Record".
+4.  `VoiceViewModel` calls `VoiceRepository.transcribeAudio(file)`.
+5.  Backend returns JSON (`{ "transcript": "..." }`).
+6.  `VoiceViewModel` shows transcript to user.
+7.  User confirms / Auto-sends.
+8.  `VoiceViewModel` calls `VoiceRepository.sendCommand(transcript)`.
+9.  Backend returns JSON (`{ "type": "meeting", "parsed_data": {...}, ... }`).
+10. `VoiceViewModel` updates `uiState` with Success/Error AND `parsedData`.
+    *   **Success**: Show Toast + Display `parsedData`.
+    *   **Error**: Display backend `error` and `details` text on screen (not just Toast).
+11. `MainActivity` renders the state accordingly.
 
 ## 4. API Definition
 **POST** `https://<gateway-url>/command`

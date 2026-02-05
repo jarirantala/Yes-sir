@@ -11,4 +11,9 @@ interface ApiService {
     @POST(".")
     @Headers("Content-Type: application/json")
     suspend fun sendCommand(@Body request: CommandRequest): Response<CommandResponse>
+
+    @POST(".")
+    suspend fun uploadAudio(@Body audio: okhttp3.RequestBody): Response<TranscriptResponse>
 }
+
+data class TranscriptResponse(val transcript: String)
