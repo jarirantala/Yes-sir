@@ -64,6 +64,9 @@ Powered by **Mistral Small 3.2 (24B Instruct)**, the system automatically distin
 
 ## Getting Started
 
+### 🤝 Contributing & Workflows
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the project's standard operating procedures and available **Skills**.
+
 ### Backend Deployment
 See [DEPLOYMENT.md](DEPLOYMENT.md) for instructions on deploying the Python function to Scaleway.
 
