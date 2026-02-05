@@ -36,7 +36,7 @@ The application extends beyond a single utility, providing a platform for variou
 * **REQ-F-008:** **WHEN** a successful response is received, **THE SYSTEM SHALL** display the `parsed_data` JSON on the main screen for user verification.
 
 ### 3.2 Feature: Intent Recognition (Backend LLM)
-* **REQ-B-020:** **WHEN** the `POST /command` endpoint receives a request, **THE SYSTEM SHALL** send the transcript to **Llama 3.1 70B Instruct** for analysis.
+* **REQ-B-020:** **WHEN** the `POST /command` endpoint receives a request, **THE SYSTEM SHALL** send the transcript to **mistral-small-3.2-24b-instruct-2506** for analysis.
 * **REQ-B-021:** **THE SYSTEM SHALL** use **System Prompting** to define the assistant's persona and enforce a strict JSON output format.
 * **REQ-B-022:** **THE SYSTEM SHALL** enable **JSON Mode** (if supported by the provider) or strictly enforce JSON structure via the prompt to ensure deterministic parsing.
 * **REQ-B-023:** **THE SYSTEM SHALL** extract the following fields in the JSON output:

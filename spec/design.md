@@ -71,7 +71,7 @@ sequenceDiagram
 
 ### 2.2 Backend (Scaleway Serverless)
 *   **Function Endpoint:** Single entry point for assistant requests.
-*   **LLM Service:** Llama 3.1 70B Instruct (via Scaleway or External API) for NLU. See [prompts.md](prompts.md) for System Prompt details.
+*   **LLM Service:** mistral-small-3.2-24b-instruct-2506 (via Scaleway or External API) for NLU. See [prompts.md](prompts.md) for System Prompt details.
 *   **Scaleway Functions:** Python function hosting logic for Voice Calendar and Voice Todo.
 *   **Persistence (MongoDB):** Managed Document Store for Todo items and other state.
 
@@ -80,7 +80,7 @@ sequenceDiagram
 ### 3.1 Voice Calendar
 1.  **Capture:** User speaks commands/meeting details.
 2.  **Transcribe:** Device converts speech to text.
-3.  **Process:** Backend sends text to Llama 3.1 to extract structured JSON (Date, Time, Topic).
+3.  **Process:** Backend sends text to Mistral Small to extract structured JSON (Date, Time, Topic).
 4.  **Action:** Backend executes the action (Sending Email Invite).
 
 ### 3.2 Voice Todo

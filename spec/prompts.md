@@ -1,6 +1,6 @@
 # System Prompts
 
-This document defines the system prompts used by the LLM (Llama 3.1 70B Instruct) to perform intent recognition and entity extraction.
+This document defines the system prompts used by the LLM (mistral-small-3.2-24b-instruct-2506) to perform intent recognition and entity extraction.
 
 ## Main Dispatch Prompt
 
