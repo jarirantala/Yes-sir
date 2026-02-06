@@ -2,7 +2,8 @@ import os
 import json
 import logging
 import datetime
-import requests
+import urllib.request
+import urllib.error
 
 logger = logging.getLogger()
 
@@ -71,25 +72,27 @@ def analyze_transcript(transcript, timezone="UTC"):
     }
 
     try:
-        response = requests.post(api_url, headers=headers, json=payload, timeout=10)
-        response.raise_for_status()
+        data = json.dumps(payload).encode('utf-8')
+        req = urllib.request.Request(api_url, data=data, headers=headers, method="POST")
         
-        result = response.json()
-        content = result['choices'][0]['message']['content']
-        
-        logger.info(f"LLM Raw Response: {content}")
-        
-        # Parse JSON
-        parsed_data = json.loads(content)
-        return parsed_data
+        with urllib.request.urlopen(req, timeout=10) as response:
+            result = json.load(response)
+            content = result['choices'][0]['message']['content']
+            
+            logger.info(f"LLM Raw Response: {content}")
+            
+            # Parse JSON
+            parsed_data = json.loads(content)
+            return parsed_data
 
-    except requests.exceptions.RequestException as e:
-        logger.error(f"LLM API Request Failed: {e}")
-        raise Exception(f"Failed to contact AI service: {str(e)}")
+    except urllib.error.HTTPError as e:
+        logger.error(f"LLM API Request Failed: {e.code} {e.reason}")
+        raise Exception(f"Failed to contact AI service: {e.code}")
+    except urllib.error.URLError as e:
+        logger.error(f"LLM Connection Failed: {e.reason}")
+        raise Exception(f"Failed to contact AI service: {e.reason}")
     except json.JSONDecodeError as e:
-        logger.error(f"LLM JSON Parse Failed. Content: {content}")
-        # Fallback logic could go here, but per spec we treat as error or generic todo
-        # For now, let's return a generic TODO structure if parsing fails but content exists
+        logger.error(f"LLM JSON Parse Failed. Content: {content if 'content' in locals() else 'unknown'}")
         logger.warning("Falling back to generic TODO")
         return {
             "intent": "TODO",

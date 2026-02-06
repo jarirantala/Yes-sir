@@ -23,7 +23,7 @@ data "archive_file" "function_zip" {
   type        = "zip"
   source_dir  = "${path.module}/backend"
   output_path = "${path.module}/function.zip"
-  excludes    = [".env", "__pycache__", "*.pyc", "venv", ".venv"]
+  excludes    = [".env", "__pycache__", "*.pyc", "venv", ".venv", "tests", "*.egg-info", "dist", "build"]
 }
 
 # Create Function Namespace
@@ -39,7 +39,7 @@ resource "scaleway_function" "main" {
   name               = "voice-assistant"
   runtime            = "python311"
   handler            = "handler.handler"
-  privacy            = "private"
+  privacy            = "public"
   zip_file           = data.archive_file.function_zip.output_path
   zip_hash           = data.archive_file.function_zip.output_base64sha256
   deploy             = true
@@ -54,14 +54,19 @@ resource "scaleway_function" "main" {
     MONGO_INSTANCE_ID        = var.mongo_instance_id
     MONGO_PRIVATE_NETWORK_ID = var.mongo_private_network_id
     MONGO_REGION             = var.mongo_region
-    MONGO_TLS_CERT_FILE      = var.mongo_tls_cert_file # "cert.pem" inside the zip
+    MONGO_TLS_CERT_FILE      = var.mongo_tls_cert_file
     SENDER_EMAIL             = var.sender_email
+    LLM_API_URL              = var.llm_api_url
+    LLM_MODEL                = var.llm_model
+    STT_MODEL                = var.stt_model
   }
 
   secret_environment_variables = {
-    SCW_ACCESS_KEY = var.scw_access_key
-    SCW_SECRET_KEY = var.scw_secret_key
-    MONGO_PASSWORD = var.mongo_password
+    SCW_ACCESS_KEY   = var.scw_access_key
+    SCW_SECRET_KEY   = var.scw_secret_key
+    MONGO_PASSWORD   = var.mongo_password
+    SCALEWAY_API_KEY = var.scw_secret_key # Reusing Secret Key
+    LLM_API_KEY      = var.scw_secret_key # Reusing Secret Key
   }
 }
 
@@ -69,4 +74,8 @@ resource "scaleway_function" "main" {
 resource "scaleway_function_token" "main" {
   function_id = scaleway_function.main.id
   description = "Token for Android App"
+}
+
+output "function_url" {
+  value = scaleway_function.main.domain_name
 }

@@ -11,10 +11,10 @@ client = None
 
 def get_mongo_collection():
     global client
+    db_name = os.environ.get('MONGO_DB_NAME', 'voice_assistant')
     if not client:
         user = os.environ.get('MONGO_USERNAME')
         password = os.environ.get('MONGO_PASSWORD')
-        db_name = os.environ.get('MONGO_DB_NAME', 'voice_assistant')
         
         instance_id = os.environ.get('MONGO_INSTANCE_ID')
         private_network_id = os.environ.get('MONGO_PRIVATE_NETWORK_ID')

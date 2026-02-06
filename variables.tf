@@ -46,3 +46,18 @@ variable "mongo_db_name" {
 variable "sender_email" {
   type = string
 }
+
+variable "llm_api_url" {
+  type    = string
+  default = "https://api.scaleway.ai/v1/chat/completions"
+}
+
+variable "llm_model" {
+  type    = string
+  default = "mistral-small-3.2-24b-instruct-2506"
+}
+
+variable "stt_model" {
+  type    = string
+  default = "whisper-large-v3"
+}
