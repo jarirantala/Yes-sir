@@ -59,6 +59,7 @@ resource "scaleway_function" "main" {
     LLM_API_URL              = var.llm_api_url
     LLM_MODEL                = var.llm_model
     STT_MODEL                = var.stt_model
+    RECIPIENT_EMAIL          = var.sender_email
   }
 
   secret_environment_variables = {

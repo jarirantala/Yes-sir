@@ -183,7 +183,6 @@ def handler(event, context):
         logger.info("Event is None or empty")
         return {'statusCode': 400, 'body': json.dumps({'error': 'No event data'})}
 
-    logger.info(f"Event keys: {list(event.keys())}")
     headers = event.get('headers', {})
     
     # Case-insensitive header lookup
@@ -211,11 +210,24 @@ def handler(event, context):
 
         # 2. Handle Text Command or Base64 Audio (Intent Recognition + Action)
         body = event.get('body', {})
-        if isinstance(body, str):
+        is_body_base64 = event.get('isBase64Encoded', False)
+        
+        if isinstance(body, str) and body:
+            if is_body_base64:
+                import base64
+                try:
+                    body = base64.b64decode(body).decode('utf-8')
+                except Exception as e:
+                    logger.warning(f"Failed to decode base64 body: {e}")
+            
             try:
-                body = json.loads(body) if body.strip() else {}
+                body = json.loads(body)
             except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON body: {e}. Body start: {body[:100]}")
                 return {'statusCode': 400, 'body': json.dumps({'error': 'Invalid JSON body'})}
+        
+        if not body or not isinstance(body, dict):
+            body = {}
         
         # Check for Base64 Audio in JSON
         audio_base64 = body.get('audio_base64')
@@ -230,7 +242,7 @@ def handler(event, context):
 
         transcript = body.get('transcript')
         timezone = body.get('timezone', 'UTC')
-        email = body.get('email') or os.environ.get('RECIPIENT_EMAIL')
+        email = body.get('email') or os.environ.get('RECIPIENT_EMAIL') or os.environ.get('SENDER_EMAIL')
 
         if not transcript:
             return {'statusCode': 400, 'body': json.dumps({'error': 'Missing transcript in JSON body'})}

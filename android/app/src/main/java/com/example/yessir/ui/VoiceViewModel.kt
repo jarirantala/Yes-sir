@@ -34,7 +34,7 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
     fun startRecording() {
         try {
             val cacheDir = getApplication<Application>().cacheDir
-            recordingFile = File.createTempFile("voice_command", ".m4a", cacheDir)
+            recordingFile = File.createTempFile("voice_command", ".wav", cacheDir)
             audioRecorder.start(recordingFile!!)
             _uiState.value = VoiceUiState.Listening
         } catch (e: Exception) {

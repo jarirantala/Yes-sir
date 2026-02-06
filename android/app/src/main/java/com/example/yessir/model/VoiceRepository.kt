@@ -11,8 +11,15 @@ class VoiceRepository {
 
     suspend fun transcribeAudio(file: File): Result<TranscriptResponse> {
         return try {
-            val requestBody = file.asRequestBody("audio/mpeg".toMediaTypeOrNull())
-            val response = api.uploadAudio(requestBody)
+            val bytes = file.readBytes()
+            val base64String = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+            
+            // Determine content type (though backend defaults to wav, m4a is what we record)
+            val contentType = if (file.name.endsWith(".m4a")) "audio/m4a" else "audio/wav"
+            
+            val request = AudioUploadRequest(base64String, contentType)
+            val response = api.uploadAudio(request)
+            
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {

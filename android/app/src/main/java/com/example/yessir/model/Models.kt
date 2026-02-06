@@ -11,3 +11,8 @@ data class MeetingResponse(
     val error: String?,
     val messageId: String?
 )
+
+data class AudioUploadRequest(
+    val audio_base64: String,
+    val content_type: String
+)
