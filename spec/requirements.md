@@ -14,11 +14,18 @@ The application extends beyond a single utility, providing a platform for variou
 * **As a** user, **I want** to receive an email invite immediately, **so that** I can add it to my calendar with one click.
 
 ### Feature 2: Voice Todo
-* **As a** user, **I want** to capture random thoughts as tasks, **so that** I don't forget them.
-* **As a** user, **I want** these tasks to be saved to a list, **so that** I can review them later.
+* **As a** user, **I want** to capture random thoughts as tasks, **so that** I can review and check them off later.
 
-### Feature 3: Unified Assistant
-* **As a** user, **I want** to just speak without selecting a specific mode, **so that** the assistant figures out if I mean a meeting or a todo automatically.
+### Feature 3: Second Brain (Notes)
+* **As a** user, **I want** to dictate long-form notes or "brain dumps", **so that** they are stored as searchable text.
+* **As a** user, **I want** these notes to be kept separate from my actionable todos, **so that** I can keep my focus clear.
+
+### Feature 4: Public Transportation Helper
+* **As a** user, **I want** to ask for public transit directions to a place, **so that** I can quickly get on my way.
+* **As a** user, **I want** the system to provide a direct link to Google Maps transit directions, **so that** I don't have to manually search for it.
+
+### Feature 5: Unified Assistant
+* **As a** user, **I want** to just speak without selecting a specific mode, **so that** the assistant figures out if I mean a meeting, a todo, a note, or a navigation request automatically.
 
 ## 3. Functional Requirements (EARS Notation)
 
@@ -40,11 +47,12 @@ The application extends beyond a single utility, providing a platform for variou
 * **REQ-B-021:** **THE SYSTEM SHALL** use **System Prompting** to define the assistant's persona and enforce a strict JSON output format.
 * **REQ-B-022:** **THE SYSTEM SHALL** enable **JSON Mode** (if supported by the provider) or strictly enforce JSON structure via the prompt to ensure deterministic parsing.
 * **REQ-B-023:** **THE SYSTEM SHALL** extract the following fields in the JSON output:
-    *   `intent`: One of "MEETING" or "TODO".
-    *   `title`: A concise summary or original text.
+*   `intent`: One of "MEETING", "TODO", "NOTE", or "TRANSPORT".
+    *   `title`: A concise summary, note content, or destination.
     *   `datetime`: ISO 8601 formatted date/time (for meetings).
     *   `duration`: Duration in minutes (for meetings).
     *   `priority`: One of "low", "medium", "high" (for todos).
+    *   `destination`: The target location for navigation (for transport).
 * **REQ-B-024:** **WHEN** the LLM fails to return valid JSON, **THE SYSTEM SHALL** treat it as a generic Todo.
 
 ### 3.3 Feature: Voice Calendar (Backend)
@@ -59,6 +67,16 @@ The application extends beyond a single utility, providing a platform for variou
 * **REQ-B-010:** **WHEN** the intent is **TODO**, **THE SYSTEM SHALL** extract the task description and priority.
 * **REQ-B-011:** **WHEN** the task is parsed, **THE SYSTEM SHALL** save the item to the MongoDB database.
 * **REQ-B-012:** **WHEN** the item is saved, **THE SYSTEM SHALL** respond with the saved item ID.
+
+### 3.5 Feature: Second Brain (Backend)
+* **REQ-B-030:** **WHEN** the intent is **NOTE**, **THE SYSTEM SHALL** extract the note content as `title`.
+* **REQ-B-031:** **WHEN** the note is parsed, **THE SYSTEM SHALL** save the note to the "notes" collection in MongoDB.
+* **REQ-B-032:** **WHEN** the note is saved, **THE SYSTEM SHALL** respond with the note's text content and timestamp.
+
+### 3.6 Feature: Public Transportation Helper (Backend)
+* **REQ-B-040:** **WHEN** the intent is **TRANSPORT**, **THE SYSTEM SHALL** identify the destination.
+* **REQ-B-041:** **THE SYSTEM SHALL** generate a Google Maps Deep Link using the format: `https://www.google.com/maps/dir/?api=1&destination=<DESTINATION>&travelmode=transit`.
+* **REQ-B-042:** **THE SYSTEM SHALL** respond with the destination name and the generated deep link.
 
 ## 4. Non-Functional Requirements
 * **NFR-001:** The backend cold start latency shall not exceed 5 seconds.

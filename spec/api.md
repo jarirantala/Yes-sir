@@ -86,6 +86,39 @@ Used to execute an action based on a transcribed text command.
   }
 }
 ```
+
+**Success Response (200 OK) - Note Saved**
+```json
+{
+  "type": "note",
+  "message": "Note saved",
+  "parsed_data": {
+    "intent": "NOTE",
+    "title": "the new office code is 1234"
+  },
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "text": "the new office code is 1234",
+    "created_at": "2023-10-27T10:05:00Z"
+  }
+}
+```
+
+**Success Response (200 OK) - Transport Link Generated**
+```json
+{
+  "type": "transport",
+  "message": "Directions ready",
+  "parsed_data": {
+    "intent": "TRANSPORT",
+    "destination": "the airport"
+  },
+  "data": {
+    "destination": "the airport",
+    "deeplink": "https://www.google.com/maps/dir/?api=1&destination=the+airport&travelmode=transit"
+  }
+}
+```
 ---
 
 ### Error Responses

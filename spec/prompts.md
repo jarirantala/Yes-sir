@@ -37,6 +37,22 @@ MATCH ONE OF THE FOLLOWING INTENTS and output ONLY valid JSON.
   "priority": "string (enum: 'low', 'medium', 'high' - default 'medium')"
 }
 
+### 3. NOTE
+**Trigger**: User wants to save a random thought, a brain dump, or a piece of information that isn't a task or a meeting.
+**Output Schema**:
+{
+  "intent": "NOTE",
+  "title": "string (the full content of the note)"
+}
+
+### 4. TRANSPORT
+**Trigger**: User wants public transportation directions, bus routes, or train times to a specific destination.
+**Output Schema**:
+{
+  "intent": "TRANSPORT",
+  "destination": "string (the name or address of the destination)"
+}
+
 ### RULES
 1. **Current Reference**: Today is {{current_time}}. Use this to resolve relative dates like "tomorrow", "next Friday", "in 2 hours".
 2. **Ambiguity**: If unclear, default to TODO.
@@ -64,5 +80,23 @@ MATCH ONE OF THE FOLLOWING INTENTS and output ONLY valid JSON.
   "intent": "TODO",
   "title": "Buy milk",
   "priority": "high"
+}
+```
+
+**Input**: "Take a note that the new office code is 1234."
+**Output**:
+```json
+{
+  "intent": "NOTE",
+  "title": "the new office code is 1234"
+}
+```
+
+**Input**: "How do I get to the airport by bus?"
+**Output**:
+```json
+{
+  "intent": "TRANSPORT",
+  "destination": "the airport"
 }
 ```
