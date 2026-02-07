@@ -38,13 +38,11 @@ Internal data structure used to represent a stored note.
 | `text` | String | The note content. |
 | `created_at`| DateTime | Timestamp of creation. |
 
-## 5. Intent Recognition
-Logic used to determine which action to take based on the transcript.
+## 6. Multilingual Support
+The system provides native-level support for Finnish alongside English.
 
-| Intent | Keywords (Case-insensitive) | Default Action |
-|--------|-----------------------------|----------------|
-| **MEETING** | "meeting", "schedule", "invite", "calendar", "appointment" | Parse as Meeting Details and send invite. |
-| **TODO** | "todo", "task", "remind me", "buy" | Parse as Todo Item and save to list. |
-| **NOTE** | "note", "brain dump", "remember that", "take a note" | Save content to **Notes** collection. |
-| **TRANSPORT** | "bus", "train", "directions", "how do I get to", "transport" | Generate Google Maps transit deep link. |
-| **UNKNOWN** | (None) | Fallback to **TODO** treatment. |
+| Component | Finnish Implementation |
+|-----------|------------------------|
+| **STT** | Whisper hint `language='fi'` for optimized transcription. |
+| **LLM Prompt** | Bilingual system prompt with Finnish context examples. |
+| **Localization** | Android `strings.xml` and `strings.xml (fi)` for UI elements. |

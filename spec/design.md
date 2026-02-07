@@ -71,9 +71,9 @@ sequenceDiagram
 
 ### 2.2 Backend (Scaleway Serverless)
 *   **Function Endpoint:** Single entry point for assistant requests.
-*   **LLM Service:** mistral-small-3.2-24b-instruct-2506 (via Scaleway or External API) for NLU. See [prompts.md](prompts.md) for System Prompt details.
-*   **Scaleway Functions:** Python function hosting logic for Voice Calendar and Voice Todo.
-*   **Persistence (MongoDB):** Managed Document Store for Todo items and other state.
+*   **LLM Service:** mistral-small-3.2-24b-instruct-2506 (via Scaleway or External API) for NLU. Supports English and Finnish bilingual processing. See [prompts.md](prompts.md) for details.
+*   **STT Service:** Scaleway STT (Whisper) with Finnish language hinting.
+*   **Persistence (MongoDB):** Managed Document Store with collections for `todos` and `notes`.
 
 ## 3. Data Flow
 

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -86,12 +87,12 @@ fun VoiceApp(viewModel: VoiceViewModel) {
         
         // Status Display
         when (val state = uiState) {
-            is VoiceUiState.Ready -> StatusText("Ready")
-            is VoiceUiState.Listening -> StatusText("Listening...")
-            is VoiceUiState.Transcribing -> StatusText("Transcribing...")
-            is VoiceUiState.Processing -> StatusText("Processing Command...")
+            is VoiceUiState.Ready -> StatusText(stringResource(R.string.status_ready))
+            is VoiceUiState.Listening -> StatusText(stringResource(R.string.status_listening))
+            is VoiceUiState.Transcribing -> StatusText(stringResource(R.string.status_transcribing))
+            is VoiceUiState.Processing -> StatusText(stringResource(R.string.status_processing))
             is VoiceUiState.Success -> {
-                StatusText("Success!")
+                StatusText(stringResource(R.string.status_success))
                 Text(text = state.message, style = MaterialTheme.typography.bodyLarge)
                 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -109,7 +110,7 @@ fun VoiceApp(viewModel: VoiceViewModel) {
                             },
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
                         ) {
-                            Text("Open Google Maps: $dest")
+                            Text(stringResource(R.string.button_open_maps, dest))
                         }
                     }
                 }
@@ -118,27 +119,27 @@ fun VoiceApp(viewModel: VoiceViewModel) {
                 if (state.type == "note") {
                     val noteText = state.data?.get("text") as? String
                     if (noteText != null) {
-                        JSONCard(title = "Stored Note", json = noteText)
+                        JSONCard(title = stringResource(R.string.title_stored_note), json = noteText)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 
                 if (state.parsedData != null) {
-                    JSONCard(title = "Mistral Analysis (JSON)", json = gson.toJson(state.parsedData))
+                    JSONCard(title = stringResource(R.string.title_mistral_analysis), json = gson.toJson(state.parsedData))
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { viewModel.reset() }) { Text("Done") }
+                Button(onClick = { viewModel.reset() }) { Text(stringResource(R.string.button_done)) }
             }
             is VoiceUiState.Error -> {
-                StatusText("Error!", Color.Red)
+                StatusText(stringResource(R.string.status_error), Color.Red)
                 Text(text = state.message, color = Color.Red)
                 if (state.details != null) {
                     Text(text = state.details, style = MaterialTheme.typography.bodySmall, color = Color.Red)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                Button(onClick = { viewModel.reset() }) { Text("Try Again") }
+                Button(onClick = { viewModel.reset() }) { Text(stringResource(R.string.button_try_again)) }
             }
         }
 
@@ -174,10 +175,10 @@ fun VoiceApp(viewModel: VoiceViewModel) {
                         }
                     }
             ) {
-                Text(if (uiState is VoiceUiState.Listening) "LISTENING" else "HOLD")
+                Text(if (uiState is VoiceUiState.Listening) stringResource(R.string.button_listening) else stringResource(R.string.button_hold_to_speak))
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Text("Hold to Speak", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.hint_hold_to_speak), style = MaterialTheme.typography.bodySmall)
         }
         
         Spacer(modifier = Modifier.height(20.dp))

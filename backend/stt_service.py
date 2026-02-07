@@ -34,7 +34,8 @@ def handle_speech_to_text(audio_data, content_type, is_base64=False):
 
     # Prepare multipart data
     fields = {
-        'model': os.environ.get('STT_MODEL', 'whisper-large-v3')
+        'model': os.environ.get('STT_MODEL', 'whisper-large-v3'),
+        'language': 'fi' # Prioritize Finnish for better accuracy and speed
     }
     
     # Determine extension from content_type

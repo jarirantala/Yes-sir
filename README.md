@@ -11,14 +11,17 @@ One simple "Hold to Speak" button for all interactions. The system intelligently
 Powered by **Mistral Small 3.2 (24B Instruct)**, the system automatically distinguishes between:
 *   **Meeting Invites**: "Schedule a sync with the team tomorrow at 2 PM." -> Extracts Title, Date, Time, Duration.
 *   **Todo Items**: "Remind me to buy milk urgently." -> Extracts Task Description and Priority (Low/Medium/High).
+*   **Second Brain (Notes)**: "I just had an idea for a sci-fi novel about AI." -> Persists long-form thoughts.
+*   **Transportation Helper**: "How do I get to Helsinki Central Station?" -> Generates direct Google Maps transit links.
 
-### 3. Voice Calendar
-*   Automatically extracts meeting details relative to your current time (e.g., "tomorrow").
-*   Generates calendar invites (Mocked/Planned integration).
+### 3. Multilingual (English & Finnish)
+*   **Full Finnish Support**: Speak and interact in Finnish!
+*   **Whisper STT**: optimized with language hinting for high-accuracy Finnish transcription.
+*   **Bilingual LLM**: Mistral natively understands Finnish commands and converts them to structured outcomes.
 
-### 4. Voice Todo
-*   Captures tasks and saves them to a structured list.
-*   **Persisted Storage**: Tasks are stored in **MongoDB**.
+### 4. Voice Contexts
+*   **Calendar**: Automatically extracts meeting details relative to your current time (e.g., "tomorrow").
+*   **Tasks & Notes**: Persisted in **MongoDB** for later review.
 
 ## Technical Architecture
 
@@ -52,6 +55,11 @@ Powered by **Mistral Small 3.2 (24B Instruct)**, the system automatically distin
 ```text
 ├── android/                 # Android Studio Project
 │   ├── app/src/main/java/   # Kotlin Source Code
+│   │   ├── ...
+│   │   ├── ui/
+│   │   │   ├── VoiceUiState.kt      # State Management
+│   │   │   └── components/
+│   │   │       └── CommonComponents.kt # Reusable UI
 │   └── ...
 ├── backend/                 # Python Serverless Function
 │   ├── handler.py           # Main Entry Point

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Yes-sir</string>
+    <string name="status_ready">Ready</string>
+    <string name="status_listening">Listening...</string>
+    <string name="status_transcribing">Transcribing...</string>
+    <string name="status_processing">Processing Command...</string>
+    <string name="status_success">Success!</string>
+    <string name="status_error">Error!</string>
+    <string name="button_hold_to_speak">HOLD</string>
+    <string name="button_listening">LISTENING</string>
+    <string name="button_try_again">Try Again</string>
+    <string name="button_reset">Reset</string>
+    <string name="button_done">Done</string>
+    <string name="button_open_maps">Open Google Maps: %1$s</string>
+    <string name="hint_hold_to_speak">Hold to Speak</string>
+    <string name="title_mistral_analysis">Mistral Analysis (JSON)</string>
+    <string name="title_stored_note">Stored Note</string>
+    <string name="error_mic_permission">Microphone permission needed</string>
+    <string name="error_command_failed">Command Failed</string>
+</resources>

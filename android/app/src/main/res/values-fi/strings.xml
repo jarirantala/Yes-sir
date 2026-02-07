@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Yes-sir</string>
+    <string name="status_ready">Valmis</string>
+    <string name="status_listening">Kuunnellaan...</string>
+    <string name="status_transcribing">Kirjoitetaan puhetta puhtaaksi...</string>
+    <string name="status_processing">Käsitellään komentoa...</string>
+    <string name="status_success">Onnistui!</string>
+    <string name="status_error">Virhe!</string>
+    <string name="button_hold_to_speak">PIDÄ</string>
+    <string name="button_listening">KUUNNELLAAN</string>
+    <string name="button_try_again">Yritä uudelleen</string>
+    <string name="button_reset">Nollaa</string>
+    <string name="button_done">Valmis</string>
+    <string name="button_open_maps">Avaa Google Maps: %1$s</string>
+    <string name="hint_hold_to_speak">Pidä pohjassa puhuaksesi</string>
+    <string name="title_mistral_analysis">Mistralin analyysi (JSON)</string>
+    <string name="title_stored_note">Tallennettu muistiinpano</string>
+    <string name="error_mic_permission">Mikrofonilupa tarvitaan</string>
+    <string name="error_command_failed">Komento epäonnistui</string>
+</resources>

@@ -30,3 +30,6 @@ if __name__ == "__main__":
     
     print("\n--- Testing TRANSPORT intent ---")
     send_command("How do I get to Helsinki-Vantaa Airport by train?")
+
+    print("\n--- Testing Finnish NOTE intent ---")
+    send_command("Kirjoita muistiinpano että saunan lämpötila on 80 astetta.")

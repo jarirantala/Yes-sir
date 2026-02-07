@@ -10,7 +10,13 @@ We will use **Model-View-ViewModel (MVVM)** to separate UI logic from business l
 2.  **ViewModel (`VoiceViewModel`)**:
     *   Manages `AudioRecorder` state (Recording, Idle).
     *   Initiates API calls via the Repository (Upload, then Execute).
-3.  **Model / Repository (`VoiceRepository`)**:
+3.  **UI State (`VoiceUiState`)**:
+    *   Defined in `ui/VoiceUiState.kt`.
+    *   Sealed class representing states: `Ready`, `Listening`, `Transcribing`, `Processing`, `Success`, `Error`.
+4.  **Reusable Components**:
+    *   Located in `ui/components/CommonComponents.kt`.
+    *   Provides standardized `StatusText` and `JSONCard` elements.
+5.  **Model / Repository (`VoiceRepository`)**:
     *   Abstracts the data source.
     *   Calls `ApiService` (Retrofit) for both `transcribeAudio` and `sendCommand`.
 
