@@ -71,6 +71,28 @@ def handler(event, context):
     if not event:
         return {'statusCode': 400, 'body': json.dumps({'error': 'No event data'})}
 
+    method = event.get('httpMethod', 'POST')
+    
+    # Handle DELETE for cleanup
+    if method == 'DELETE':
+        body = _parse_event_body(event)
+        item_id = body.get('id')
+        item_type = body.get('type')
+        
+        if not item_id or not item_type:
+            return {'statusCode': 400, 'body': json.dumps({'error': 'Missing id or type for deletion'})}
+            
+        success = False
+        if item_type == 'todo':
+            success = database.delete_todo_item(item_id)
+        elif item_type == 'note':
+            success = database.delete_note_item(item_id)
+            
+        return {
+            'statusCode': 200 if success else 404,
+            'body': json.dumps({'success': success, 'message': 'Item deleted' if success else 'Item not found'})
+        }
+
     try:
         headers = event.get('headers', {})
         content_type = next((v for k, v in headers.items() if k.lower() == 'content-type'), 'application/json')

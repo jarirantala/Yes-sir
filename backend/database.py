@@ -94,3 +94,26 @@ def save_note_item(text):
     except Exception as e:
         logger.error(f"Mongo Error saving note: {e}")
         raise e
+
+def delete_todo_item(item_id):
+    try:
+        collection = get_mongo_collection()
+        if collection is not None:
+            result = collection.delete_one({'id': item_id})
+            return result.deleted_count > 0
+        return False
+    except Exception as e:
+        logger.error(f"Mongo Error deleting todo: {e}")
+        return False
+
+def delete_note_item(item_id):
+    try:
+        db = _get_db()
+        if db is not None:
+            collection = db[NOTES_COLLECTION]
+            result = collection.delete_one({'id': item_id})
+            return result.deleted_count > 0
+        return False
+    except Exception as e:
+        logger.error(f"Mongo Error deleting note: {e}")
+        return False
