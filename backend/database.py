@@ -9,7 +9,11 @@ logger = logging.getLogger()
 # MongoDB Client (Global to reuse across invocations for warm starts)
 client = None
 
-def get_mongo_collection():
+# Collection Names
+TODOS_COLLECTION = 'todos'
+NOTES_COLLECTION = 'notes'
+
+def _get_db():
     global client
     db_name = os.environ.get('MONGO_DB_NAME', 'voice_assistant')
     if not client:
@@ -41,8 +45,12 @@ def get_mongo_collection():
 
         client = pymongo.MongoClient(uri)
         
-    db = client[db_name]
-    return db['todos']
+    return client[db_name]
+
+def get_mongo_collection():
+    """Legacy helper for backward compatibility, returns 'todos' collection"""
+    db = _get_db()
+    return db[TODOS_COLLECTION] if db is not None else None
 
 def save_todo_item(text, priority):
     try:
@@ -64,4 +72,25 @@ def save_todo_item(text, priority):
         return item
     except Exception as e:
         logger.error(f"Mongo Error: {e}")
+        raise e
+
+def save_note_item(text):
+    try:
+        db = _get_db()
+        if db is None:
+             raise Exception("Database connection not configured")
+        
+        collection = db[NOTES_COLLECTION]
+        
+        item = {
+            'id': str(uuid.uuid4()),
+            'text': text,
+            'created_at': datetime.datetime.utcnow().isoformat()
+        }
+        
+        collection.insert_one(item)
+        item.pop('_id', None)
+        return item
+    except Exception as e:
+        logger.error(f"Mongo Error saving note: {e}")
         raise e

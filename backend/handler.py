@@ -10,6 +10,9 @@ import base64
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# URL Templates
+GOOGLE_MAPS_TRANSIT_URL = "https://www.google.com/maps/dir/?api=1&destination={dest}&travelmode=transit"
+
 def _parse_event_body(event):
     """
     Recovers and parses the request body, handling gateway-imposed base64 encoding.
@@ -53,6 +56,16 @@ def handle_todo(parsed_data):
         }
     except Exception as e:
         return {'statusCode': 500, 'body': json.dumps({'error': 'Failed to save task', 'details': str(e)})}
+
+def handle_note(parsed_data):
+    try:
+        item = database.save_note_item(parsed_data.get('title', ''))
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'type': 'note', 'message': 'Note saved', 'parsed_data': parsed_data, 'data': item})
+        }
+    except Exception as e:
+        return {'statusCode': 500, 'body': json.dumps({'error': 'Failed to save note', 'details': str(e)})}
 
 def handler(event, context):
     if not event:
@@ -100,6 +113,28 @@ def handler(event, context):
             if not email:
                 return {'statusCode': 500, 'body': json.dumps({'error': 'Recipient email not configured'})}
             return handle_meeting(parsed_data, email, timezone)
+        
+        if intent == "NOTE":
+            return handle_note(parsed_data)
+            
+        if intent == "TRANSPORT":
+            dest = parsed_data.get('destination', 'Unknown')
+            import urllib.parse
+            encoded_dest = urllib.parse.quote_plus(dest)
+            deeplink = GOOGLE_MAPS_TRANSIT_URL.format(dest=encoded_dest)
+            
+            return {
+                'statusCode': 200,
+                'body': json.dumps({
+                    'type': 'transport',
+                    'message': 'Directions ready',
+                    'parsed_data': parsed_data,
+                    'data': {
+                        'destination': dest,
+                        'deeplink': deeplink
+                    }
+                })
+            }
         
         return handle_todo(parsed_data)
 

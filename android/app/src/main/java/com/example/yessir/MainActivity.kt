@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.yessir.ui.VoiceUiState
 import com.example.yessir.ui.VoiceViewModel
+import com.example.yessir.ui.components.JSONCard
+import com.example.yessir.ui.components.StatusText
 import com.google.gson.GsonBuilder
 
 class MainActivity : ComponentActivity() {
@@ -90,12 +92,44 @@ fun VoiceApp(viewModel: VoiceViewModel) {
             is VoiceUiState.Processing -> StatusText("Processing Command...")
             is VoiceUiState.Success -> {
                 StatusText("Success!")
+                Text(text = state.message, style = MaterialTheme.typography.bodyLarge)
+                
                 Spacer(modifier = Modifier.height(10.dp))
-                if (state.parsedData != null) {
-                   JSONCard(title = "Mistral Analysis", json = gson.toJson(state.parsedData))
+                
+                // Special handling for TRANSPORT
+                if (state.type == "transport") {
+                    val dest = state.data?.get("destination") as? String ?: "Destination"
+                    val deeplink = state.data?.get("deeplink") as? String
+                    
+                    if (deeplink != null) {
+                        Button(
+                            onClick = {
+                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(deeplink))
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
+                        ) {
+                            Text("Open Google Maps: $dest")
+                        }
+                    }
                 }
+
+                // Show Note content if it's a note
+                if (state.type == "note") {
+                    val noteText = state.data?.get("text") as? String
+                    if (noteText != null) {
+                        JSONCard(title = "Stored Note", json = noteText)
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(10.dp))
-                Button(onClick = { viewModel.reset() }) { Text("Reset") }
+                
+                if (state.parsedData != null) {
+                    JSONCard(title = "Mistral Analysis (JSON)", json = gson.toJson(state.parsedData))
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { viewModel.reset() }) { Text("Done") }
             }
             is VoiceUiState.Error -> {
                 StatusText("Error!", Color.Red)
@@ -150,34 +184,4 @@ fun VoiceApp(viewModel: VoiceViewModel) {
     }
 }
 
-@Composable
-fun StatusText(text: String, color: Color = MaterialTheme.colorScheme.onBackground) {
-    Text(text = text, style = MaterialTheme.typography.headlineSmall, color = color)
-}
 
-@Composable
-fun JSONCard(title: String, json: String) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 300.dp) 
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = title, style = MaterialTheme.typography.labelLarge)
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.05f))
-                    .verticalScroll(rememberScrollState())
-                    .padding(4.dp)
-            ) {
-                Text(
-                    text = json, 
-                    fontFamily = FontFamily.Monospace,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    }
-}

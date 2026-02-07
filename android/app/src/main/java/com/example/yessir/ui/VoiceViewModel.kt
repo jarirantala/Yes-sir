@@ -12,15 +12,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.TimeZone
 
-// Sealed UI State
-sealed class VoiceUiState {
-    object Ready : VoiceUiState()
-    object Listening : VoiceUiState()
-    object Transcribing : VoiceUiState()
-    object Processing : VoiceUiState()
-    data class Success(val message: String, val parsedData: Map<String, Any>?) : VoiceUiState()
-    data class Error(val message: String, val details: String? = null) : VoiceUiState()
-}
+// Sealed UI State moved to VoiceUiState.kt
 
 class VoiceViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -77,7 +69,12 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
                 if (response.error != null) {
                     _uiState.value = VoiceUiState.Error(response.error, response.details)
                 } else {
-                    _uiState.value = VoiceUiState.Success(response.message, response.parsedData)
+                    _uiState.value = VoiceUiState.Success(
+                        message = response.message,
+                        type = response.type,
+                        parsedData = response.parsedData,
+                        data = response.data
+                    )
                 }
             }.onFailure { e ->
                  _uiState.value = VoiceUiState.Error("Command Failed", e.message)
