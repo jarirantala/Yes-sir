@@ -23,6 +23,32 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
     private val audioRecorder = AudioRecorder(application)
     private var recordingFile: File? = null
 
+    private val _todoItems = kotlinx.coroutines.flow.MutableStateFlow<List<com.example.yessir.model.HistoryItem>>(emptyList())
+    val todoItems: kotlinx.coroutines.flow.StateFlow<List<com.example.yessir.model.HistoryItem>> = _todoItems
+
+    private val _noteItems = kotlinx.coroutines.flow.MutableStateFlow<List<com.example.yessir.model.HistoryItem>>(emptyList())
+    val noteItems: kotlinx.coroutines.flow.StateFlow<List<com.example.yessir.model.HistoryItem>> = _noteItems
+
+    private val _isHistoryLoading = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val isHistoryLoading: kotlinx.coroutines.flow.StateFlow<Boolean> = _isHistoryLoading
+
+    init {
+        fetchAllHistory()
+    }
+
+    private fun fetchAllHistory() {
+        viewModelScope.launch {
+            _isHistoryLoading.value = true
+            val todoResult = repository.listItems("todo")
+            val noteResult = repository.listItems("note")
+            
+            todoResult.onSuccess { response -> _todoItems.value = response.data }
+            noteResult.onSuccess { response -> _noteItems.value = response.data }
+            
+            _isHistoryLoading.value = false
+        }
+    }
+
     fun startRecording() {
         try {
             val cacheDir = getApplication<Application>().cacheDir
@@ -75,6 +101,19 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
                         parsedData = response.parsedData,
                         data = response.data
                     )
+                    
+                    // Sync new items to local cache immediately
+                    val newItem = com.example.yessir.model.HistoryItem(
+                        id = response.data?.get("id") as? String ?: java.util.UUID.randomUUID().toString(),
+                        title = response.data?.get("title") as? String,
+                        text = response.data?.get("text") as? String,
+                        created_at = response.data?.get("created_at") as? String ?: java.time.LocalDateTime.now().toString()
+                    )
+                    
+                    when (response.type) {
+                        "todo" -> _todoItems.value = listOf(newItem) + _todoItems.value
+                        "note" -> _noteItems.value = listOf(newItem) + _noteItems.value
+                    }
                 }
             }.onFailure { e ->
                  _uiState.value = VoiceUiState.Error("Command Failed", e.message)
@@ -84,5 +123,18 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
     
     fun reset() {
         _uiState.value = VoiceUiState.Ready
+    }
+
+    fun deleteItem(id: String, type: String) {
+        viewModelScope.launch {
+            val result = repository.deleteItem(id, type)
+            result.onSuccess {
+                // Remove from local list immediately
+                when (type) {
+                    "todo" -> _todoItems.value = _todoItems.value.filter { it.id != id }
+                    "note" -> _noteItems.value = _noteItems.value.filter { it.id != id }
+                }
+            }
+        }
     }
 }

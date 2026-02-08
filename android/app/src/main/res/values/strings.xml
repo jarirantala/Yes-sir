@@ -17,4 +17,13 @@
     <string name="title_stored_note">Stored Note</string>
     <string name="error_mic_permission">Microphone permission needed</string>
     <string name="error_command_failed">Command Failed</string>
+    <string name="title_history">Activity History</string>
+    <string name="button_view_history">View History</string>
+    <string name="tab_todos">To-Dos</string>
+    <string name="tab_notes">Notes</string>
+    <string name="button_delete">Delete</string>
+    <string name="empty_list">No items found</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_history">History</string>
+    <string name="content_desc_menu">Open Navigation Menu</string>
 </resources>

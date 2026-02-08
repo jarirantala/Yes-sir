@@ -17,4 +17,13 @@
     <string name="title_stored_note">Tallennettu muistiinpano</string>
     <string name="error_mic_permission">Mikrofonilupa tarvitaan</string>
     <string name="error_command_failed">Komento epäonnistui</string>
+    <string name="title_history">Historia</string>
+    <string name="button_view_history">Näytä historia</string>
+    <string name="tab_todos">Tehtävät</string>
+    <string name="tab_notes">Muistiinpanot</string>
+    <string name="button_delete">Poista</string>
+    <string name="empty_list">Ei kohteita</string>
+    <string name="menu_home">Koti</string>
+    <string name="menu_history">Historia</string>
+    <string name="content_desc_menu">Avaa valikko</string>
 </resources>

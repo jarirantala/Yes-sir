@@ -117,3 +117,27 @@ def delete_note_item(item_id):
     except Exception as e:
         logger.error(f"Mongo Error deleting note: {e}")
         return False
+
+def get_all_todos():
+    try:
+        collection = get_mongo_collection()
+        if collection is not None:
+            # Sort by created_at descending (newest first)
+            items = list(collection.find({}, {'_id': 0}).sort('created_at', -1))
+            return items
+        return []
+    except Exception as e:
+        logger.error(f"Mongo Error listing todos: {e}")
+        return []
+
+def get_all_notes():
+    try:
+        db = _get_db()
+        if db is not None:
+            collection = db[NOTES_COLLECTION]
+            items = list(collection.find({}, {'_id': 0}).sort('created_at', -1))
+            return items
+        return []
+    except Exception as e:
+        logger.error(f"Mongo Error listing notes: {e}")
+        return []

@@ -5,6 +5,8 @@ import database
 import llm_service
 import stt_service
 import base64
+import datetime
+import pytz
 
 # Configure logging
 logger = logging.getLogger()
@@ -93,6 +95,22 @@ def handler(event, context):
             'body': json.dumps({'success': success, 'message': 'Item deleted' if success else 'Item not found'})
         }
 
+    # Handle GET for listing
+    if method == 'GET':
+        params = event.get('queryStringParameters', {})
+        action = params.get('action')
+        item_type = params.get('type')
+        
+        if action == 'list':
+            if item_type == 'todo':
+                items = database.get_all_todos()
+                return {'statusCode': 200, 'body': json.dumps({'status': 'success', 'type': 'todo_list', 'data': items})}
+            elif item_type == 'note':
+                items = database.get_all_notes()
+                return {'statusCode': 200, 'body': json.dumps({'status': 'success', 'type': 'note_list', 'data': items})}
+            
+        return {'statusCode': 400, 'body': json.dumps({'error': 'Invalid GET request parameters'})}
+
     try:
         headers = event.get('headers', {})
         content_type = next((v for k, v in headers.items() if k.lower() == 'content-type'), 'application/json')
@@ -128,8 +146,17 @@ def handler(event, context):
         timezone = body.get('timezone', 'UTC')
         email = body.get('email') or os.environ.get('RECIPIENT_EMAIL') or os.environ.get('SENDER_EMAIL')
 
-        parsed_data = llm_service.analyze_transcript(transcript, timezone)
+        # Generate current time for the prompt
+        try:
+            tz = pytz.timezone(timezone)
+        except:
+            tz = pytz.UTC
+        current_time_iso = datetime.datetime.now(tz).isoformat()
+        
+        logger.info(f"Analyzing transcript: '{transcript}' in timezone {timezone}")
+        parsed_data = llm_service.analyze_transcript(transcript, current_time_iso)
         intent = parsed_data.get('intent', 'TODO')
+        logger.info(f"Extracted Intent: {intent}")
         
         if intent == "MEETING":
             if not email:

@@ -43,4 +43,31 @@ class VoiceRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun listItems(type: String): Result<ListResponse> {
+        return try {
+            val response = api.listItems(type = type)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("List failed: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteItem(id: String, type: String): Result<DeleteResponse> {
+        return try {
+            val request = DeleteRequest(id, type)
+            val response = api.deleteItem(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Delete failed: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
