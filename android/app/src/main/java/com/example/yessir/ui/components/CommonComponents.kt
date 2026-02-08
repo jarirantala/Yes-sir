@@ -26,7 +26,7 @@ fun JSONCard(title: String, json: String) {
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(text = title, style = MaterialTheme.typography.labelLarge)
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
             Box(
                 modifier = Modifier
                     .fillMaxSize()

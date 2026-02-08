@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.yessir.R
 import com.example.yessir.model.HistoryItem
+import com.example.yessir.constants.IntentTypes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +32,11 @@ fun ListItemsScreen(
     val historyItemsList = if (selectedTab == 0) todoItems else noteItems
     
     val isLoading by viewModel.isHistoryLoading.collectAsState()
+
+    LaunchedEffect(selectedTab) {
+        if (selectedTab == 0) viewModel.loadTodosIfNeeded()
+        else viewModel.loadNotesIfNeeded()
+    }
 
     Scaffold(
         topBar = {
@@ -73,7 +79,7 @@ fun ListItemsScreen(
                             },
                             trailingContent = {
                                 IconButton(onClick = { 
-                                    viewModel.deleteItem(item.id, if (selectedTab == 0) "todo" else "note") 
+                                    viewModel.deleteItem(item.id, if (selectedTab == 0) IntentTypes.TODO else IntentTypes.NOTE) 
                                 }) {
                                     Icon(Icons.Default.Delete, contentDescription = "Delete")
                                 }

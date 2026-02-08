@@ -121,6 +121,72 @@ Used to execute an action based on a transcribed text command.
 ```
 ---
 
+### 3. List Items
+
+Used to retrieve a list of all stored To-Dos or Notes.
+
+**Request**
+- **Method:** `GET`
+- **Query Parameters:**
+  | Name    | Type   | Required | Description                                  |
+  |---------|--------|----------|----------------------------------------------|
+  | `action`| string | Yes      | Must be `list`.                              |
+  | `type`  | string | Yes      | Either `todo` or `note`.                     |
+
+**Example Request**
+`GET /?action=list&type=todo`
+
+**Response (200 OK)**
+```json
+{
+  "status": "success",
+  "type": "todo_list",
+  "data": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "text": "Buy milk",
+      "priority": "normal",
+      "created_at": "2023-10-27T10:00:00Z"
+    },
+    { ... }
+  ]
+}
+```
+
+---
+
+### 4. Delete Item
+
+Used to remove a specific To-Do or Note.
+
+**Request**
+- **Method:** `DELETE`
+- **Content-Type:** `application/json`
+
+**Body Parameters**
+| Name   | Type   | Required | Description              |
+|--------|--------|----------|--------------------------|
+| `id`   | string | Yes      | The unique ID of the item. |
+| `type` | string | Yes      | Either `todo` or `note`. |
+
+**Example Request**
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "type": "todo"
+}
+```
+
+**Response (200 OK)**
+```json
+{
+  "success": true,
+  "message": "Item deleted"
+}
+```
+
+---
+
 ### Error Responses
 
 **400 Bad Request**

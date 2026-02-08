@@ -19,16 +19,19 @@ Powered by **Mistral Small 3.2 (24B Instruct)**, the system automatically distin
 *   **Whisper STT**: optimized with language hinting for high-accuracy Finnish transcription.
 *   **Bilingual LLM**: Mistral natively understands Finnish commands and converts them to structured outcomes.
 
-### 4. Voice Contexts
-*   **Calendar**: Automatically extracts meeting details relative to your current time (e.g., "tomorrow").
-*   **Tasks & Notes**: Persisted in **MongoDB** for later review.
+### 4. Performance Optimized Navigation
+*   **Startup Priority**: The app is interactive instantly. Data is only fetched when truly needed (Lazy Loading).
+*   **Session-Based Caching**: Once loaded, data is persisted in-memory for the duration of the session, making subsequent visits instantaneous.
+*   **Flat Multi-Category Access**: Direct home/to-do/note access via the Hamburger menu.
 
 ## Technical Architecture
 
 ### Android Application (`android/`)
 *   **Language**: Kotlin
 *   **UI Framework**: Jetpack Compose
-*   **Architecture**: MVVM with `Sealed Class` State Management.
+*   **Architecture**: MVVM with `StateFlow` and localized state observers.
+*   **Navigation**: Jetpack Compose Navigation with drawer-based global routing.
+*   **Performance**: Lazy loading for history items with session-based caching.
 *   **Audio**: Raw audio capture via `MediaRecorder` (AAC/M4A), uploaded directly to the backend.
 *   **Network**: OkHttp/Retrofit for multipart audio upload and JSON API calls.
 

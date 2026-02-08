@@ -6,10 +6,11 @@ We will use **Model-View-ViewModel (MVVM)** to separate UI logic from business l
 ### Components
 1.  **View (`MainActivity`)**:
     *   Handles UI rendering (Button, Toasts).
-    *   Observes ViewModel state (`LiveData` or `StateFlow`).
+    *   Observes ViewModel state (`LiveData` for UI flow, `StateFlow` for data lists).
 2.  **ViewModel (`VoiceViewModel`)**:
     *   Manages `AudioRecorder` state (Recording, Idle).
-    *   Initiates API calls via the Repository (Upload, then Execute).
+    *   Initiates API calls via the Repository.
+    *   Implements **Session-based Caching**: Loads data on-demand (Lazy Loading) once per session.
 3.  **UI State (`VoiceUiState`)**:
     *   Defined in `ui/VoiceUiState.kt`.
     *   Sealed class representing states: `Ready`, `Listening`, `Transcribing`, `Processing`, `Success`, `Error`.
@@ -28,20 +29,21 @@ We will use **Model-View-ViewModel (MVVM)** to separate UI logic from business l
 *   **JSON Parsing**: Gson or Moshi
 *   **Audio**: `MediaRecorder` (AAC/M4A)
 
-## 3. Data Flow
-1.  User holds "Record".
-2.  `AudioRecorder` captures audio to file.
-3.  User releases "Record".
-4.  `VoiceViewModel` calls `VoiceRepository.transcribeAudio(file)`.
-5.  Backend returns JSON (`{ "transcript": "..." }`).
-6.  `VoiceViewModel` shows transcript to user.
-7.  User confirms / Auto-sends.
-8.  `VoiceViewModel` calls `VoiceRepository.sendCommand(transcript)`.
-9.  Backend returns JSON (`{ "type": "meeting", "parsed_data": {...}, ... }`).
-10. `VoiceViewModel` updates `uiState` with Success/Error AND `parsedData`.
-    *   **Success**: Show Toast + Display `parsedData`.
-    *   **Error**: Display backend `error` and `details` text on screen (not just Toast).
-11. `MainActivity` renders the state accordingly.
+## 3. Data Flow & Navigation
+1.  **Global UI Shell**: A `ModalNavigationDrawer` wrap the app, providing direct access to Home, To-Dos, and Notes.
+2.  **Voice Interaction**:
+    - User holds "Record".
+    - `AudioRecorder` captures audio to file.
+    - User releases "Record".
+    - `VoiceViewModel` calls `VoiceRepository.transcribeAudio(file)`.
+    - Backend returns transcript.
+    - `VoiceViewModel` calls `VoiceRepository.sendCommand(transcript)`.
+    - Backend returns structured result.
+3.  **Real-time Cache Sync**:
+    - When a new TODO/NOTE is created via voice, it is immediately prepended to the local `StateFlow` cache.
+4.  **Lazy Loading**:
+    - Database lists are fetched from the backend ONLY when the user first visits the To-Do or Note screen.
+    - Subsequent visits use the cached data.
 
 ## 4. API Definition
 **POST** `https://<gateway-url>/command`
