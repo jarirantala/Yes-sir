@@ -93,7 +93,7 @@ fun ListItemsScreen(
                         ListItem(
                             headlineContent = { Text(item.text ?: item.title ?: "") },
                             supportingContent = { 
-                                item.created_at?.let { Text(it) }
+                                item.created_at?.let { Text(formatTimestamp(it)) }
                             },
                             trailingContent = {
                                 IconButton(onClick = { 
@@ -109,5 +109,17 @@ fun ListItemsScreen(
                 }
             }
         }
+    }
+}
+
+private fun formatTimestamp(isoString: String): String {
+    return try {
+        // Backend sends UTC ISO8601 (often naive)
+        // e.g. 2024-02-08T12:00:00.000000
+        val parsed = java.time.LocalDateTime.parse(isoString)
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH.mm")
+        parsed.format(formatter)
+    } catch (e: Exception) {
+        isoString
     }
 }
