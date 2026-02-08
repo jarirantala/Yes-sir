@@ -117,7 +117,7 @@ private fun formatTimestamp(isoString: String): String {
         // Backend sends UTC ISO8601 (often naive)
         // e.g. 2024-02-08T12:00:00.000000
         val parsed = java.time.LocalDateTime.parse(isoString)
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH.mm")
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
         parsed.format(formatter)
     } catch (e: Exception) {
         isoString
