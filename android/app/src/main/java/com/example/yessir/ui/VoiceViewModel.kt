@@ -50,7 +50,7 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
         loadKeywords()
     }
 
-    private fun loadKeywords() {
+    fun loadKeywords() {
         viewModelScope.launch {
             repository.getKeywords().onSuccess {
                 _keywords.value = it

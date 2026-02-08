@@ -26,6 +26,13 @@ fun SettingsScreen(
 
     var showAddDialog by remember { mutableStateOf(false) }
 
+    // Reload keywords when entering settings to ensure data is fresh, especially after process death
+    LaunchedEffect(Unit) {
+        if (keywords.isEmpty()) {
+            viewModel.loadKeywords()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
