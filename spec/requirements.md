@@ -27,6 +27,14 @@ The application extends beyond a single utility, providing a platform for variou
 ### Feature 5: Unified Assistant
 * **As a** user, **I want** to just speak without selecting a specific mode, **so that** the assistant figures out if I mean a meeting, a todo, a note, or a navigation request automatically.
 
+### Feature 6: History Management
+* **As a** user, **I want** to view my past Todos and Notes, **so that** I can track what I've captured.
+* **As a** user, **I want** to delete items I no longer need, **so that** I can keep my lists clean.
+
+### Feature 7: Settings & Keywords
+* **As a** user, **I want** to define custom keywords (e.g., "Home", "Office"), **so that** I can use them in navigation commands (e.g., "Navigate Home").
+* **As a** user, **I want** to see the app version, **so that** I know I'm running the latest update.
+
 ## 3. Functional Requirements (EARS Notation)
 
 ### 3.0 Platform / General
@@ -77,6 +85,18 @@ The application extends beyond a single utility, providing a platform for variou
 * **REQ-B-040:** **WHEN** the intent is **TRANSPORT**, **THE SYSTEM SHALL** identify the destination.
 * **REQ-B-041:** **THE SYSTEM SHALL** generate a Google Maps Deep Link using the format: `https://www.google.com/maps/dir/?api=1&destination=<DESTINATION>&travelmode=transit`.
 * **REQ-B-042:** **THE SYSTEM SHALL** respond with the destination name and the generated deep link.
+
+### 3.7 Feature: History Management (Android & Backend)
+* **REQ-F-070:** **WHEN** the user opens the "Activity History" (To-Dos/Notes), **THE SYSTEM SHALL** fetch the list of items from the backend.
+* **REQ-F-071:** **THE SYSTEM SHALL** display items with their creation timestamp formatted as `DD.MM.YYYY hh:mm`.
+* **REQ-F-072:** **WHEN** the user clicks "Delete", **THE SYSTEM SHALL** call the backend to remove the item and update the list locally.
+
+### 3.8 Feature: Settings & Keywords (Android & Backend)
+* **REQ-F-080:** **WHEN** the user opens "Settings", **THE SYSTEM SHALL** display the list of defined keywords.
+* **REQ-F-081:** **THE SYSTEM SHALL** allow adding new `(key, value)` pairs (e.g., "Home" -> "123 Main St").
+* **REQ-F-082:** **THE SYSTEM SHALL** allow deleting existing keywords.
+* **REQ-F-083:** **WHEN** a Transport command is processed, **THE SYSTEM SHALL** resolve the destination against these keywords locally before generating the deep link.
+* **REQ-F-084:** **THE SYSTEM SHALL** display the current App Version (e.g., `v1.0.2`) on the main screen.
 
 ## 4. Non-Functional Requirements
 * **NFR-001:** The backend cold start latency shall not exceed 5 seconds.

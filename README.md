@@ -9,7 +9,7 @@ One simple "Hold to Speak" button for all interactions. The system intelligently
 
 ### 2. Intelligent Intent Recognition
 Powered by **Mistral Small 3.2 (24B Instruct)**, the system automatically distinguishes between:
-*   **Meeting Invites**: "Schedule a sync with the team tomorrow at 2 PM." -> Extracts Title, Date, Time, Duration.
+*   **Meeting Invites**: "Schedule a sync with the team tomorrow at 2 PM." -> Extracts Title, Date, Time, Duration. Not yet sending email.
 *   **Todo Items**: "Remind me to buy milk urgently." -> Extracts Task Description and Priority (Low/Medium/High).
 *   **Second Brain (Notes)**: "I just had an idea for a sci-fi novel about AI." -> Persists long-form thoughts.
 *   **Transportation Helper**: "How do I get to Helsinki Central Station?" -> Generates direct Google Maps transit links.
@@ -19,10 +19,16 @@ Powered by **Mistral Small 3.2 (24B Instruct)**, the system automatically distin
 *   **Whisper STT**: optimized with language hinting for high-accuracy Finnish transcription.
 *   **Bilingual LLM**: Mistral natively understands Finnish commands and converts them to structured outcomes.
 
-### 4. Performance Optimized Navigation
+### 4. Smart Settings & History
+*   **Keyword Management**: Define custom address shortcuts (e.g., "Home" -> "123 Main St") for one-tap navigation.
+*   **History View**: Review and manage your past To-Dos and Notes.
+*   **Version Tracking**: Always know which version you are running.
+
+### 5. Performance Optimized Navigation
 *   **Startup Priority**: The app is interactive instantly. Data is only fetched when truly needed (Lazy Loading).
 *   **Session-Based Caching**: Once loaded, data is persisted in-memory for the duration of the session, making subsequent visits instantaneous.
-*   **Flat Multi-Category Access**: Direct home/to-do/note access via the Hamburger menu.
+*   **Smart Reloading**: Keywords are automatically refreshed if missing when entering Settings.
+*   **Flat Multi-Category Access**: Direct home/to-do/note/settings access via the Hamburger menu.
 
 ## Technical Architecture
 
@@ -34,6 +40,7 @@ Powered by **Mistral Small 3.2 (24B Instruct)**, the system automatically distin
 *   **Performance**: Lazy loading for history items with session-based caching.
 *   **Audio**: Raw audio capture via `MediaRecorder` (AAC/M4A), uploaded directly to the backend.
 *   **Network**: OkHttp/Retrofit for multipart audio upload and JSON API calls.
+*   **Configuration**: `buildConfig` enabled for version display.
 
 ### Serverless Backend (`backend/`)
 *   **Runtime**: Python 3.10+ (Scaleway Functions).

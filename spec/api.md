@@ -187,6 +187,76 @@ Used to remove a specific To-Do or Note.
 
 ---
 
+### 5. Keyword Management
+
+Used to manage address keywords (shortcuts) for navigation.
+
+#### 5.1 List Keywords
+
+**Request**
+- **Method:** `GET`
+- **Query Parameters:** `action=list`, `type=keyword`
+
+**Response (200 OK)**
+```json
+{
+  "status": "success",
+  "type": "keyword_list",
+  "data": {
+    "home": "123 Main St",
+    "office": "Tech Park, Building 4"
+  }
+}
+```
+
+#### 5.2 Add Keyword
+
+**Request**
+- **Method:** `POST`
+- **Body:**
+```json
+{
+  "type": "keyword",
+  "key": "home",
+  "value": "123 Main St"
+}
+```
+
+**Response (200 OK)**
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "...",
+    "key": "home",
+    "value": "123 Main St",
+    "created_at": "..."
+  }
+}
+```
+
+#### 5.3 Delete Keyword
+
+**Request**
+- **Method:** `DELETE`
+- **Body:**
+```json
+{
+  "type": "keyword",
+  "key": "home"
+}
+```
+
+**Response (200 OK)**
+```json
+{
+  "success": true,
+  "message": "Keyword deleted"
+}
+```
+
+---
+
 ### Error Responses
 
 **400 Bad Request**

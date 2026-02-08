@@ -14,10 +14,14 @@ We will use **Model-View-ViewModel (MVVM)** to separate UI logic from business l
 3.  **UI State (`VoiceUiState`)**:
     *   Defined in `ui/VoiceUiState.kt`.
     *   Sealed class representing states: `Ready`, `Listening`, `Transcribing`, `Processing`, `Success`, `Error`.
-4.  **Reusable Components**:
+4.  **Screens**:
+    *   `VoiceHomeScreen`: Main voice interaction.
+    *   `ListItemsScreen`: Displays history of Todos and Notes.
+    *   `SettingsScreen`: Manages Keywords.
+5.  **Reusable Components**:
     *   Located in `ui/components/CommonComponents.kt`.
     *   Provides standardized `StatusText` and `JSONCard` elements.
-5.  **Model / Repository (`VoiceRepository`)**:
+6.  **Model / Repository (`VoiceRepository`)**:
     *   Abstracts the data source.
     *   Calls `ApiService` (Retrofit) for both `transcribeAudio` and `sendCommand`.
 
@@ -44,6 +48,10 @@ We will use **Model-View-ViewModel (MVVM)** to separate UI logic from business l
 4.  **Lazy Loading**:
     - Database lists are fetched from the backend ONLY when the user first visits the To-Do or Note screen.
     - Subsequent visits use the cached data.
+    - **Keywords** are reloaded when entering **Settings** if the list is empty.
+5.  **Keyword Resolution**:
+    - Address keywords (e.g. "Home") are stored in MongoDB and cached in the App.
+    - When a "Transport" intent returns a destination, the App checks its local keyword cache for a match before opening Maps.
 
 ## 4. API Definition
 **POST** `https://<gateway-url>/command`
