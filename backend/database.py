@@ -12,6 +12,7 @@ client = None
 # Collection Names
 TODOS_COLLECTION = 'todos'
 NOTES_COLLECTION = 'notes'
+KEYWORDS_COLLECTION = 'keywords'
 
 def _get_db():
     global client
@@ -138,6 +139,60 @@ def get_all_notes():
             items = list(collection.find({}, {'_id': 0}).sort('created_at', -1))
             return items
         return []
+        return []
     except Exception as e:
         logger.error(f"Mongo Error listing notes: {e}")
         return []
+
+def get_all_keywords():
+    try:
+        db = _get_db()
+        if db is not None:
+            collection = db[KEYWORDS_COLLECTION]
+            # Return as a dictionary {key: value}
+            items = list(collection.find({}, {'_id': 0}))
+            keywords = {item['key']: item['value'] for item in items if 'key' in item and 'value' in item}
+            return keywords
+        return {}
+    except Exception as e:
+        logger.error(f"Mongo Error listing keywords: {e}")
+        return {}
+
+def save_keyword(key, value):
+    try:
+        db = _get_db()
+        if db is None:
+             raise Exception("Database connection not configured")
+        
+        collection = db[KEYWORDS_COLLECTION]
+        
+        item = {
+            'id': str(uuid.uuid4()),
+            'key': key.lower(), # Normalize to lowercase
+            'value': value,
+            'created_at': datetime.datetime.utcnow().isoformat()
+        }
+        
+        # Upsert: Update if key exists, otherwise insert
+        collection.update_one(
+            {'key': key.lower()},
+            {'$set': item},
+            upsert=True
+        )
+        return item
+    except Exception as e:
+        logger.error(f"Mongo Error saving keyword: {e}")
+        raise e
+
+def delete_keyword(key):
+    try:
+        db = _get_db()
+        if db is not None:
+            collection = db[KEYWORDS_COLLECTION]
+            # Delete by key (which is unique/primary for our usage)
+            result = collection.delete_one({'key': key.lower()})
+            return result.deleted_count > 0
+        return False
+    except Exception as e:
+        logger.error(f"Mongo Error deleting keyword: {e}")
+        return False

@@ -41,3 +41,15 @@ data class HistoryItem(
     val created_at: String? = null,
     val status: String? = null
 )
+
+data class KeywordsResponse(
+    val status: String,
+    val type: String,
+    val data: Map<String, String>
+)
+
+data class KeywordRequest(
+    val type: String = "keyword",
+    val key: String,
+    val value: String
+)

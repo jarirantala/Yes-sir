@@ -33,6 +33,8 @@ fun ListItemsScreen(
     
     val isLoading by viewModel.isHistoryLoading.collectAsState()
 
+    val historyError by viewModel.historyError.collectAsState()
+
     LaunchedEffect(selectedTab) {
         if (selectedTab == 0) viewModel.loadTodosIfNeeded()
         else viewModel.loadNotesIfNeeded()
@@ -65,6 +67,22 @@ fun ListItemsScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
+            } else if (historyError != null) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = historyError ?: "Unknown error", color = MaterialTheme.colorScheme.error)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = {
+                        viewModel.clearHistoryError()
+                        if (selectedTab == 0) viewModel.loadTodosIfNeeded()
+                        else viewModel.loadNotesIfNeeded()
+                    }) {
+                        Text("Retry")
+                    }
+                }
             } else if (historyItemsList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(stringResource(R.string.empty_list))
@@ -86,7 +104,7 @@ fun ListItemsScreen(
                             },
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
-                        Divider()
+                        HorizontalDivider()
                     }
                 }
             }

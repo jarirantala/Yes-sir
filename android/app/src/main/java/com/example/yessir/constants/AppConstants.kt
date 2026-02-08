@@ -11,4 +11,5 @@ object NavKeys {
     const val HOME = "home"
     const val HISTORY = "history/{initialTab}"
     const val INITIAL_TAB = "initialTab"
+    const val SETTINGS = "settings"
 }

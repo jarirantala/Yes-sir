@@ -70,4 +70,47 @@ class VoiceRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun getKeywords(): Result<Map<String, String>> {
+        return try {
+            val response = api.listKeywords()
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!.data)
+            } else {
+                Result.failure(Exception("List keywords failed: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun saveKeyword(key: String, value: String): Result<CommandResponse> {
+        return try {
+            val request = KeywordRequest(key = key, value = value)
+            val response = api.saveKeyword(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "No error body"
+                Result.failure(Exception("Save keyword failed: ${response.code()} $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteKeyword(key: String): Result<DeleteResponse> {
+        return try {
+            // Backend handler expects 'id' to be the key for keyword type
+            val request = DeleteRequest(id = key, type = "keyword")
+            val response = api.deleteItem(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Delete keyword failed: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

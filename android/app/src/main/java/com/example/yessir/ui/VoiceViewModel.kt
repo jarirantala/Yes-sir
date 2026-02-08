@@ -10,10 +10,13 @@ import com.example.yessir.model.VoiceRepository
 import com.example.yessir.model.CommandResponse
 import com.example.yessir.constants.IntentTypes
 import kotlinx.coroutines.launch
+import android.util.Log
 import java.io.File
 import java.util.TimeZone
 
 // Sealed UI State moved to VoiceUiState.kt
+
+private const val TAG = "VoiceViewModel"
 
 class VoiceViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -36,13 +39,74 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
     private val _isHistoryLoading = kotlinx.coroutines.flow.MutableStateFlow(false)
     val isHistoryLoading: kotlinx.coroutines.flow.StateFlow<Boolean> = _isHistoryLoading
 
+    private val _historyError = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+    val historyError: kotlinx.coroutines.flow.StateFlow<String?> = _historyError
+
+    // Keywords for address resolution
+    private val _keywords = kotlinx.coroutines.flow.MutableStateFlow<Map<String, String>>(emptyMap())
+    val keywords: kotlinx.coroutines.flow.StateFlow<Map<String, String>> = _keywords
+
+    init {
+        loadKeywords()
+    }
+
+    private fun loadKeywords() {
+        viewModelScope.launch {
+            repository.getKeywords().onSuccess {
+                _keywords.value = it
+            }.onFailure {
+                // Silently fail or log error, keywords are optional enhancements
+                Log.e(TAG, "Failed to load keywords", it)
+            }
+        }
+    }
+
+    fun resolveAddress(destination: String): String {
+        // Check if destination matches a keyword (case-insensitive)
+        val lowerDest = destination.trim().lowercase()
+        return _keywords.value[lowerDest] ?: destination
+    }
+
+    fun addKeyword(key: String, value: String) {
+        viewModelScope.launch {
+            repository.saveKeyword(key, value).onSuccess {
+                // Optimistically update local state or re-fetch
+                // Since save works, let's just add it to our map
+                val current = _keywords.value.toMutableMap()
+                current[key.lowercase()] = value
+                _keywords.value = current
+            }.onFailure {
+                Log.e(TAG, "Failed to save keyword", it)
+                _historyError.value = "Failed to save keyword: ${it.message}"
+            }
+        }
+    }
+
+    fun deleteKeyword(key: String) {
+        viewModelScope.launch {
+            repository.deleteKeyword(key).onSuccess {
+                // Remove from local state
+                val current = _keywords.value.toMutableMap()
+                current.remove(key.lowercase())
+                _keywords.value = current
+            }.onFailure {
+                Log.e(TAG, "Failed to delete keyword", it)
+                _historyError.value = "Failed to delete keyword: ${it.message}"
+            }
+        }
+    }
+
     fun loadTodosIfNeeded() {
         if (hasLoadedTodos) return
         viewModelScope.launch {
             _isHistoryLoading.value = true
+            _historyError.value = null
             repository.listItems(IntentTypes.TODO).onSuccess { response ->
                 _todoItems.value = response.data
                 hasLoadedTodos = true
+            }.onFailure { e ->
+                Log.e(TAG, "Failed to load todos", e)
+                _historyError.value = "Failed to load todos: ${e.message}"
             }
             _isHistoryLoading.value = false
         }
@@ -52,12 +116,20 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
         if (hasLoadedNotes) return
         viewModelScope.launch {
             _isHistoryLoading.value = true
+            _historyError.value = null
             repository.listItems(IntentTypes.NOTE).onSuccess { response ->
                 _noteItems.value = response.data
                 hasLoadedNotes = true
+            }.onFailure { e ->
+                Log.e(TAG, "Failed to load notes", e)
+                _historyError.value = "Failed to load notes: ${e.message}"
             }
             _isHistoryLoading.value = false
         }
+    }
+
+    fun clearHistoryError() {
+        _historyError.value = null
     }
 
     fun startRecording() {

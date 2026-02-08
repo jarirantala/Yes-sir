@@ -26,4 +26,16 @@
     <string name="menu_home">Home</string>
     <string name="menu_history">History</string>
     <string name="content_desc_menu">Open Navigation Menu</string>
+    <!-- Settings Screen -->
+    <string name="title_settings">Asetukset</string>
+    <string name="content_desc_add_keyword">Add Keyword</string>
+    <string name="content_desc_delete_keyword">Delete Keyword</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="empty_keywords">No keywords defined</string>
+    <string name="dialog_title_add_keyword">Add New Keyword</string>
+    <string name="label_keyword">Keyword (e.g. home)</string>
+    <string name="label_address">Address</string>
+    <string name="action_add">Add</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="menu_settings">Asetukset</string>
 </resources>

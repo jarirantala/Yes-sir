@@ -27,6 +27,7 @@ import com.example.yessir.constants.IntentTypes
 import com.example.yessir.ui.components.JSONCard
 import com.example.yessir.ui.components.StatusText
 import com.google.gson.GsonBuilder
+import com.example.yessir.BuildConfig
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -70,11 +71,15 @@ fun VoiceHomeScreen(
             )
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -98,8 +103,25 @@ fun VoiceHomeScreen(
                         if (deeplink != null) {
                             Button(
                                 onClick = {
-                                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(deeplink))
-                                    context.startActivity(intent)
+                                    val resolvedDest = viewModel.resolveAddress(dest)
+                                    // Use original deeplink if no alias found (resolveAddress returns original if not found).
+                                    // But wait, resolveAddress returns the *address* (e.g. "123 Main St").
+                                    // The original deeplink is "google.com/maps...destination=home".
+                                    // If we resolved it, we should construct a new URI.
+                                    
+                                    val uriString = if (resolvedDest != dest) {
+                                        // It was an alias!
+                                        "https://www.google.com/maps/dir/?api=1&destination=${android.net.Uri.encode(resolvedDest)}&travelmode=transit"
+                                    } else {
+                                        deeplink
+                                    }
+                                    
+                                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(uriString))
+                                    try {
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Could not open Maps", Toast.LENGTH_SHORT).show()
+                                    }
                                 },
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
                             ) {
@@ -177,6 +199,16 @@ fun VoiceHomeScreen(
             }
             
             Spacer(modifier = Modifier.height(20.dp))
+        }
+
+        Text(
+            text = "v${BuildConfig.VERSION_NAME}",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.Gray,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+        )
         }
     }
 }

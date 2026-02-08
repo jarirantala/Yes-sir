@@ -92,6 +92,15 @@ class MainActivity : ComponentActivity() {
                                     },
                                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                                 )
+                                NavigationDrawerItem(
+                                    label = { Text(stringResource(R.string.menu_settings)) },
+                                    selected = false,
+                                    onClick = {
+                                        navController.navigate(NavKeys.SETTINGS)
+                                        scope.launch { drawerState.close() }
+                                    },
+                                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                                )
                             }
                         }
                     ) {
@@ -131,6 +140,12 @@ fun AppNavigation(
             ListItemsScreen(
                 viewModel = viewModel,
                 initialTab = initialTab,
+                onMenuClick = onMenuClick
+            )
+        }
+        composable(NavKeys.SETTINGS) {
+            com.example.yessir.ui.SettingsScreen(
+                viewModel = viewModel,
                 onMenuClick = onMenuClick
             )
         }

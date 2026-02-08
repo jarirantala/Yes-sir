@@ -55,6 +55,17 @@ def handler(event, context):
             success = database.delete_todo_item(item_id)
         elif item_type == 'note':
             success = database.delete_note_item(item_id)
+        elif item_type == 'keyword':
+            # For keywords, the 'id' field in the request might be the key itself or the UUID.
+            # Implementation plan said "delete_keyword(id)". 
+            # In database.py I implemented delete_keyword(key).
+            # So let's assume the frontend sends the *key* as the 'id', or we need to handle UUIDs.
+            # Looking at database.py save_keyword, we store 'key' and 'id'.
+            # Ideally we should delete by ID if we have it, but key is also unique.
+            # Let's check database.py content I just wrote.
+            # I implemented `delete_keyword(key)` deleting by `{'key': key.lower()}`.
+            # So I should pass the key.
+            success = database.delete_keyword(item_id) # item_id here will be the key name
             
         return {
             'statusCode': 200 if success else 404,
@@ -74,6 +85,9 @@ def handler(event, context):
             elif item_type == 'note':
                 items = database.get_all_notes()
                 return {'statusCode': 200, 'body': json.dumps({'status': 'success', 'type': 'note_list', 'data': items})}
+            elif item_type == 'keyword':
+                keywords = database.get_all_keywords()
+                return {'statusCode': 200, 'body': json.dumps({'status': 'success', 'type': 'keyword_list', 'data': keywords})}
             
         return {'statusCode': 400, 'body': json.dumps({'error': 'Invalid GET request parameters'})}
 
@@ -104,10 +118,26 @@ def handler(event, context):
             except Exception as e:
                 return {'statusCode': 400, 'body': json.dumps({'error': 'Invalid base64 audio', 'details': str(e)})}
 
-        # 4. Handle Text Command (Transcript)
+        # 4. Handle Direct Keyword Creation (Settings)
+        if body.get('type') == 'keyword':
+             key = body.get('key')
+             value = body.get('value')
+             if not key or not value:
+                 logger.warning(f"Keyword creation failed. Missing key/value. Body: {body}")
+                 return {'statusCode': 400, 'body': json.dumps({'error': 'Missing key or value', 'received_body': body})}
+             
+             try:
+                 item = database.save_keyword(key, value)
+                 return {'statusCode': 200, 'body': json.dumps({'status': 'success', 'data': item})}
+             except Exception as e:
+                 logger.error(f"Save keyword error: {e}")
+                 return {'statusCode': 500, 'body': json.dumps({'error': str(e)})}
+
+        # 5. Handle Text Command (Transcript)
         transcript = body.get('transcript')
         if not transcript:
-            return {'statusCode': 400, 'body': json.dumps({'error': 'Missing transcript'})}
+            logger.warning(f"Missing transcript. Body: {body}")
+            return {'statusCode': 400, 'body': json.dumps({'error': 'Missing transcript', 'received_body': body, 'type_received': body.get('type')})}
 
         timezone = body.get('timezone', 'UTC')
         email = body.get('email') or os.environ.get('RECIPIENT_EMAIL') or os.environ.get('SENDER_EMAIL')
