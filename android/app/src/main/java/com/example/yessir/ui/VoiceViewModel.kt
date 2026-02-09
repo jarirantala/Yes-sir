@@ -46,18 +46,23 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
     private val _keywords = kotlinx.coroutines.flow.MutableStateFlow<Map<String, String>>(emptyMap())
     val keywords: kotlinx.coroutines.flow.StateFlow<Map<String, String>> = _keywords
 
+    private val _isKeywordsLoading = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val isKeywordsLoading: kotlinx.coroutines.flow.StateFlow<Boolean> = _isKeywordsLoading
+
     init {
         loadKeywords()
     }
 
     fun loadKeywords() {
         viewModelScope.launch {
+            _isKeywordsLoading.value = true
             repository.getKeywords().onSuccess {
                 _keywords.value = it
             }.onFailure {
-                // Silently fail or log error, keywords are optional enhancements
                 Log.e(TAG, "Failed to load keywords", it)
+                _historyError.value = "Failed to load keywords: ${it.message}"
             }
+            _isKeywordsLoading.value = false
         }
     }
 

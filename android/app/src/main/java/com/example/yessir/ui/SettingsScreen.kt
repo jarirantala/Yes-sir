@@ -22,6 +22,7 @@ fun SettingsScreen(
     onMenuClick: () -> Unit
 ) {
     val keywords by viewModel.keywords.collectAsState()
+    val isKeywordsLoading by viewModel.isKeywordsLoading.collectAsState()
     val error by viewModel.historyError.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
@@ -56,23 +57,34 @@ fun SettingsScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            if (error != null) {
-                Text(
-                    text = error ?: "",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Button(
-                    onClick = { viewModel.clearHistoryError() },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+            if (error != null && !isKeywordsLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(stringResource(R.string.action_dismiss))
+                    Text(
+                        text = error ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Button(onClick = { viewModel.loadKeywords() }) {
+                        Text("Retry")
+                    }
                 }
             }
 
-            if (keywords.isEmpty()) {
+            if (isKeywordsLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (keywords.isEmpty() && error == null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(stringResource(R.string.empty_keywords))
+                    Button(onClick = { viewModel.loadKeywords() }, modifier = Modifier.padding(top = 16.dp)) {
+                         Text("Reload")
+                    }
                 }
             } else {
                 LazyColumn {
