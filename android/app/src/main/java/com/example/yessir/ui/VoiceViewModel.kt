@@ -1,7 +1,9 @@
 package com.example.yessir.ui
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -18,13 +20,16 @@ import java.util.TimeZone
 
 private const val TAG = "VoiceViewModel"
 
-class VoiceViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class VoiceViewModel @Inject constructor(
+    private val app: Application,
+    private val repository: VoiceRepository,
+    private val audioRecorder: AudioRecorder
+) : ViewModel() {
 
     private val _uiState = MutableLiveData<VoiceUiState>(VoiceUiState.Ready)
     val uiState: LiveData<VoiceUiState> = _uiState
 
-    private val repository = VoiceRepository()
-    private val audioRecorder = AudioRecorder(application)
     private var recordingFile: File? = null
 
     private val _todoItems = kotlinx.coroutines.flow.MutableStateFlow<List<com.example.yessir.model.HistoryItem>>(emptyList())
@@ -56,6 +61,7 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
     fun loadKeywords() {
         viewModelScope.launch {
             _isKeywordsLoading.value = true
+            _historyError.value = null
             repository.getKeywords().onSuccess {
                 _keywords.value = it
             }.onFailure {
@@ -139,7 +145,7 @@ class VoiceViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startRecording() {
         try {
-            val cacheDir = getApplication<Application>().cacheDir
+            val cacheDir = app.cacheDir
             recordingFile = File.createTempFile("voice_command", ".wav", cacheDir)
             audioRecorder.start(recordingFile!!)
             _uiState.value = VoiceUiState.Listening

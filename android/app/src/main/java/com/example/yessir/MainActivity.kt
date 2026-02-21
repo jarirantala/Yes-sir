@@ -41,7 +41,9 @@ import androidx.compose.material.icons.filled.Menu
 import kotlinx.coroutines.launch
 import com.example.yessir.constants.NavKeys
 import com.example.yessir.ui.VoiceHomeScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: VoiceViewModel by viewModels()
 

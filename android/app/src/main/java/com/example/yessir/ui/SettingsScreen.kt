@@ -29,6 +29,7 @@ fun SettingsScreen(
 
     // Reload keywords when entering settings to ensure data is fresh, especially after process death
     LaunchedEffect(Unit) {
+        viewModel.clearHistoryError()
         if (keywords.isEmpty()) {
             viewModel.loadKeywords()
         }

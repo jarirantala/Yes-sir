@@ -1,60 +1,113 @@
+import unittest
+from unittest.mock import patch, MagicMock
 import json
-import urllib.request
+import base64
+
+# Add backend to python path for testing
+import sys
 import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
 
-ENDPOINT = "https://voiceassistantnsxsctbdhw-voice-assistant.functions.fnc.fr-par.scw.cloud/"
-TOKEN = "c6504938-090c-482d-88ec-5573427303f2"
+import handler
 
-def send_command(transcript):
-    print(f"Testing transcript: '{transcript}'")
-    headers = {
-        'Content-Type': 'application/json',
-        'X-Auth-Token': TOKEN
-    }
-    data = json.dumps({'transcript': transcript}).encode('utf-8')
-    req = urllib.request.Request(ENDPOINT, data=data, headers=headers, method="POST")
-    
-    try:
-        with urllib.request.urlopen(req) as response:
-            result = json.load(response)
-            print(f"Status: {response.status}")
-            print(f"Response: {json.dumps(result, indent=2)}")
-            return result
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
+class TestNewFeatures(unittest.TestCase):
 
-def delete_item(item_id, item_type):
-    print(f"Cleaning up {item_type} ID: {item_id}")
-    headers = {
-        'Content-Type': 'application/json',
-        'X-Auth-Token': TOKEN
-    }
-    data = json.dumps({'id': item_id, 'type': item_type}).encode('utf-8')
-    req = urllib.request.Request(ENDPOINT, data=data, headers=headers, method="DELETE")
-    
-    try:
-        with urllib.request.urlopen(req) as response:
-            result = json.load(response)
-            print(f"Cleanup Status: {response.status} - {result.get('message')}")
-            return result.get('success')
-    except Exception as e:
-        print(f"Cleanup Error: {e}")
-        return False
+    @patch('llm_service.analyze_transcript')
+    @patch('database.save_note_item')
+    def test_note_intent(self, mock_save_note, mock_analyze):
+        mock_analyze.return_value = {
+            "intent": "NOTE",
+            "title": "the secret code for the vault is 9988."
+        }
+        mock_save_note.return_value = {
+            "id": "test-note-id",
+            "text": "the secret code for the vault is 9988.",
+            "created_at": "2023-10-31T10:00:00Z"
+        }
 
-if __name__ == "__main__":
-    # 1. Test NOTE
-    print("--- Testing NOTE intent ---")
-    res = send_command("Take a note that the secret code for the vault is 9988.")
-    if res and res.get('data', {}).get('id'):
-        delete_item(res['data']['id'], 'note')
-    
-    # 2. Test TRANSPORT (No DB storage, no cleanup needed)
-    print("\n--- Testing TRANSPORT intent ---")
-    send_command("How do I get to Helsinki-Vantaa Airport by train?")
+        event = {
+            'httpMethod': 'POST',
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'transcript': 'Take a note that the secret code for the vault is 9988.'})
+        }
+        
+        response = handler.handler(event, None)
+        self.assertEqual(response['statusCode'], 200)
+        
+        body = json.loads(response['body'])
+        self.assertEqual(body['type'], 'note')
+        self.assertEqual(body['message'], 'Note saved')
+        self.assertEqual(body['data']['id'], 'test-note-id')
+        
+        mock_analyze.assert_called_once()
+        mock_save_note.assert_called_once_with("the secret code for the vault is 9988.")
 
-    # 3. Test Finnish NOTE
-    print("\n--- Testing Finnish NOTE intent ---")
-    res = send_command("Kirjoita muistiinpano että saunan lämpötila on 80 astetta.")
-    if res and res.get('data', {}).get('id'):
-        delete_item(res['data']['id'], 'note')
+    @patch('llm_service.analyze_transcript')
+    def test_transport_intent(self, mock_analyze):
+        mock_analyze.return_value = {
+            "intent": "TRANSPORT",
+            "destination": "Helsinki-Vantaa Airport"
+        }
+
+        event = {
+            'httpMethod': 'POST',
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'transcript': 'How do I get to Helsinki-Vantaa Airport by train?'})
+        }
+        
+        response = handler.handler(event, None)
+        self.assertEqual(response['statusCode'], 200)
+        
+        body = json.loads(response['body'])
+        self.assertEqual(body['type'], 'transport')
+        self.assertEqual(body['message'], 'Directions ready')
+        self.assertEqual(body['data']['destination'], 'Helsinki-Vantaa Airport')
+        self.assertIn('deeplink', body['data'])
+
+    @patch('llm_service.analyze_transcript')
+    @patch('database.save_note_item')
+    def test_finnish_note_intent(self, mock_save_note, mock_analyze):
+        mock_analyze.return_value = {
+            "intent": "NOTE",
+            "title": "saunan lämpötila on 80 astetta"
+        }
+        mock_save_note.return_value = {
+            "id": "test-finnish-note-id",
+            "text": "saunan lämpötila on 80 astetta",
+            "created_at": "2023-10-31T10:00:00Z"
+        }
+
+        event = {
+            'httpMethod': 'POST',
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'transcript': 'Kirjoita muistiinpano että saunan lämpötila on 80 astetta.'})
+        }
+        
+        response = handler.handler(event, None)
+        self.assertEqual(response['statusCode'], 200)
+        
+        body = json.loads(response['body'])
+        self.assertEqual(body['type'], 'note')
+        self.assertEqual(body['message'], 'Note saved')
+        
+        mock_analyze.assert_called_once()
+
+    @patch('database.delete_note_item')
+    def test_delete_note(self, mock_delete_note):
+        mock_delete_note.return_value = True
+
+        event = {
+            'httpMethod': 'DELETE',
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'id': 'test-note-id', 'type': 'note'})
+        }
+        
+        response = handler.handler(event, None)
+        self.assertEqual(response['statusCode'], 200)
+        
+        body = json.loads(response['body'])
+        self.assertTrue(body['success'])
+        mock_delete_note.assert_called_once_with('test-note-id')
+
+if __name__ == '__main__':
+    unittest.main()
